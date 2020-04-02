@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SCRIPTFILTER_H_INCLUDED
-#define SCRIPTFILTER_H_INCLUDED
+#pragma once
 
 #include "../MappingFilter.h"
 
@@ -23,7 +22,7 @@ public:
 	static String scriptTemplate;
 	Script script;
 
-	void processInternal() override;
+	bool processInternal() override;
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
@@ -33,7 +32,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptFilter)
 };
-
-
-
-#endif  // SCRIPTFILTER_H_INCLUDED

@@ -15,7 +15,8 @@ SendStreamValuesCommand::SendStreamValuesCommand(StreamingModule * module, Comma
 {
 	customValuesManager.reset(new CustomValuesCommandArgumentManager(context == MAPPING));
 	addChildControllableContainer(customValuesManager.get());
-	customValuesManager->addArgumentManagerListener(this);
+
+	setUseCustomValues(true);
 }
 
 SendStreamValuesCommand::~SendStreamValuesCommand()
@@ -53,13 +54,23 @@ void SendStreamValuesCommand::triggerInternal()
 		case Controllable::FLOAT: data.writeFloat(p->floatValue()); break;
 		case Controllable::STRING: data.writeString(p->stringValue()); break;
 		case Controllable::POINT2D:
-			data.writeFloat(((Point2DParameter *)a)->x);
-			data.writeFloat(((Point2DParameter *)a)->y);
+			data.writeFloat(((Point2DParameter *)p)->x);
+			data.writeFloat(((Point2DParameter *)p)->y);
 			break;
 		case Controllable::POINT3D:
-			data.writeFloat(((Point3DParameter *)a)->x);
-			data.writeFloat(((Point3DParameter *)a)->y);
-			data.writeFloat(((Point3DParameter *)a)->z);
+			data.writeFloat(((Point3DParameter *)p)->x);
+			data.writeFloat(((Point3DParameter *)p)->y);
+			data.writeFloat(((Point3DParameter *)p)->z);
+			break;
+
+		case Controllable::COLOR:
+		{
+			Colour c = ((ColorParameter*)p)->getColor();
+			data.writeFloat(c.getFloatRed());
+			data.writeFloat(c.getFloatGreen());
+			data.writeFloat(c.getFloatBlue());
+			data.writeFloat(c.getFloatAlpha());
+		}
 			break;
 
 		default:
@@ -71,20 +82,4 @@ void SendStreamValuesCommand::triggerInternal()
 
 	Array<uint8> bytes((uint8 *)data.getData(), (int)data.getDataSize());
 	streamingModule->sendBytes(bytes);
-}
-
-void SendStreamValuesCommand::useForMappingChanged(CustomValuesCommandArgument *)
-{
-	if (context != CommandContext::MAPPING) return;
-
-	clearTargetMappingParameters();
-	int index = 0;
-	for (auto &a : customValuesManager->items)
-	{
-		if (a->useForMapping != nullptr && a->useForMapping->boolValue())
-		{
-			addTargetMappingParameterAt(a->param, index);
-			index++;
-		}
-	}
 }

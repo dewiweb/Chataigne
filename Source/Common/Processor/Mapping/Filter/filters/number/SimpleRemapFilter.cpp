@@ -10,8 +10,11 @@
 
 #include "SimpleRemapFilter.h"
 
+
 SimpleRemapFilter::SimpleRemapFilter(var params) :
-	MappingFilter(getTypeString(),params)
+	MappingFilter(getTypeString(),params),
+	targetIn(nullptr),
+	targetOut(nullptr)
 {
 	useCustomInputRange = filterParams.addBoolParameter("Use Custom Input Range", "If enabled, the input range will be set from the source input range", false);
 	
@@ -22,40 +25,47 @@ SimpleRemapFilter::SimpleRemapFilter(var params) :
 	targetOut->isCustomizableByUser = false;
 	targetOut->setPoint(0, 1);
 
+	filterTypeFilters.add(Controllable::FLOAT, Controllable::INT);
 	autoSetRange = false;
-	forceOutParameterType = FloatParameter::getTypeStringStatic();
 }
 
 SimpleRemapFilter::~SimpleRemapFilter()
 {
 }
 
-void SimpleRemapFilter::processInternal()
+Parameter* SimpleRemapFilter::setupSingleParameterInternal(Parameter* source)
 {
-	if (targetOut->x == targetOut->y)
-	{
-		filteredParameter->setValue(targetOut->x);
-		return;
-	}
+	Parameter* p = MappingFilter::setupSingleParameterInternal(source);
+	if (!useCustomInputRange->isOverriden || !useCustomInputRange->boolValue()) useCustomInputRange->setValue(!source->hasRange());
+	p->setRange(jmin<float>(targetOut->x, targetOut->y), jmax<float>(targetOut->x, targetOut->y));
+	return p;
+}
+
+void SimpleRemapFilter::processSingleParameterInternal(Parameter * source, Parameter *out)
+{
+	if (targetIn == nullptr || targetOut == nullptr) return;
+	
+	float sourceVal = source->floatValue();
+	float targetVal = sourceVal;
+	if (targetOut->x == targetOut->y) targetVal = targetOut->x;
 
 	if (useCustomInputRange->boolValue())
 	{
-		if (targetIn->x == targetIn->y)
+		if (targetIn->x != targetIn->y && targetOut->x != targetOut->y)
 		{
-			filteredParameter->setValue(targetOut->x);
-			return;
+			float targetValue = jmap(source->floatValue(), targetIn->x, targetIn->y, targetOut->x, targetOut->y);
+			if (targetOut->x > targetOut->y) targetValue = targetOut->y + (targetValue - targetOut->y) / (targetOut->x - targetOut->y);
+			out->setValue(targetValue);
 		}
-			
-		float targetValue = jmap(sourceParam->floatValue(), targetIn->x, targetIn->y, targetOut->x, targetOut->y);
-		if (targetOut->x > targetOut->y) targetValue = targetOut->y + (targetValue - targetOut->y) / (targetOut->x - targetOut->y);
-		filteredParameter->setValue(targetValue);
-	} else
+	}
+	else
 	{
-		float targetNValue = sourceParam->getNormalizedValue();
+		float targetNValue = source->getNormalizedValue();
 		if (targetOut->x > targetOut->y) targetNValue = 1 - targetNValue;
-		filteredParameter->setNormalizedValue(targetNValue);
+		out->setNormalizedValue(targetNValue);
 	}
 }
+
 
 
 void SimpleRemapFilter::filterParamChanged(Parameter * p)
@@ -66,18 +76,9 @@ void SimpleRemapFilter::filterParamChanged(Parameter * p)
 
 	}else if (p == targetOut)
 	{
-
-		if (filteredParameter != nullptr)
+		for(auto &f : filteredParameters)
 		{
-			filteredParameter->setRange(jmin<float>(targetOut->x,targetOut->y), jmax<float>(targetOut->x, targetOut->y));
+			if(f->type == Controllable::FLOAT) f->setRange(jmin<float>(targetOut->x,targetOut->y), jmax<float>(targetOut->x, targetOut->y));
 		}
 	}
-}
-
-Parameter * SimpleRemapFilter::setupParameterInternal(Parameter * source)
-{ 
-	Parameter * p = MappingFilter::setupParameterInternal(source);
-	if(!useCustomInputRange->isOverriden) useCustomInputRange->setValue(!source->hasRange());
-	p->setRange(targetOut->x, jmax<float>(targetOut->x, targetOut->y));
-	return p;
 }

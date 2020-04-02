@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MIDICOMMANDS_H_INCLUDED
-#define MIDICOMMANDS_H_INCLUDED
+#pragma once
 
 #include "Common/Command/BaseCommand.h"
 
@@ -36,7 +35,7 @@ public:
 	MIDINoteAndCCCommand(MIDIModule * module, CommandContext context, var params);
 	~MIDINoteAndCCCommand();
 
-	enum MessageType {NOTE_ON,NOTE_OFF,FULL_NOTE, CONTROLCHANGE};
+	enum MessageType {NOTE_ON,NOTE_OFF,FULL_NOTE, CONTROLCHANGE, PROGRAMCHANGE, PITCH_WHEEL, CHANNEL_PRESSURE, AFTER_TOUCH};
 	enum MapTo { PITCH, VELOCITY };
 	MessageType type;
 
@@ -48,6 +47,7 @@ public:
 	FloatParameter * onTime;
 
 	BoolParameter * remap01To127;
+	int maxRemap;
 
 	void setValue(var value) override;
 	void triggerInternal() override;
@@ -78,7 +78,3 @@ public:
 	static MIDISysExCommand * create(ControllableContainer * module, CommandContext context, var params) { return new MIDISysExCommand((MIDIModule *)module, context, params); }
 
 };
-
-
-
-#endif  // MIDICOMMANDS_H_INCLUDED

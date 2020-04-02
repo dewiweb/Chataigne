@@ -25,13 +25,15 @@ BaseCommandHandler::BaseCommandHandler(const String & name, CommandContext _cont
 
 BaseCommandHandler::~BaseCommandHandler()
 {
-	if (ModuleManager::getInstanceWithoutCreating() != nullptr) ModuleManager::getInstance()->removeBaseManagerListener(this);
-	setCommand(nullptr);
+	clearItem();
 }
 
 void BaseCommandHandler::clearItem()
 {
-	setCommand(nullptr);
+	BaseItem::clearItem();
+    if (ModuleManager::getInstanceWithoutCreating() != nullptr) ModuleManager::getInstance()->removeBaseManagerListener(this);
+    if(command != nullptr && command->module != nullptr && command->module->templateManager != nullptr && !command->module->isClearing) command->module->templateManager->removeBaseManagerListener(this);
+    setCommand(nullptr);
 }
 
 
@@ -65,9 +67,11 @@ void BaseCommandHandler::setCommand(CommandDefinition * commandDef)
 	{
 		addChildControllableContainer(command.get());
 
-
-		if(!prevCommandData.isVoid()) command->loadPreviousCommandData(prevCommandData); //keep as much as similar parameter possible
-		else if (!ghostCommandData.isVoid()) command->loadJSONData(ghostCommandData);
+		
+		/*if(!prevCommandData.isVoid()) command->loadPreviousCommandData(prevCommandData); //keep as much as similar parameter possible
+		else */ 
+		if (!ghostCommandData.isVoid()) command->loadJSONData(ghostCommandData);
+		//else if (!isCurrentlyLoadingData) setNiceName(commandDef->commandType);
 
 		ghostModuleName = command->module->shortName;
 		ghostCommandMenuPath = commandDef->menuPath;
@@ -76,12 +80,23 @@ void BaseCommandHandler::setCommand(CommandDefinition * commandDef)
 
 		command->addCommandListener(this);
 		command->module->addInspectableListener(this);
-		command->module->templateManager.removeBaseManagerListener(this);
+		command->module->templateManager->removeBaseManagerListener(this);
+
+		if (!Engine::mainEngine->isClearing) clearWarning();
 
 		registerLinkedInspectable(command->module);
 
+
 		if (ModuleManager::getInstanceWithoutCreating() != nullptr) ModuleManager::getInstance()->removeBaseManagerListener(this);
 	}
+	else
+	{
+		if (!Engine::mainEngine->isClearing)
+		{
+			setWarningMessage("Command not found : " + ghostModuleName + ":" + ghostCommandName);
+		}
+	}
+
 
 	commandHandlerListeners.call(&CommandHandlerListener::commandChanged, this);
 	handlerNotifier.addMessage(new CommandHandlerEvent(CommandHandlerEvent::COMMAND_CHANGED, this));
@@ -140,6 +155,15 @@ void BaseCommandHandler::loadJSONDataInternal(var data)
 	{
 		ModuleManager::getInstance()->addBaseManagerListener(this);
 	}
+
+	if (command == nullptr && ghostCommandName.isNotEmpty())
+	{
+		setWarningMessage("Command not found : " + ghostModuleName + ":" + ghostCommandName);
+	}
+	else
+	{
+		clearWarning();
+	}
 }
 
 void BaseCommandHandler::onContainerTriggerTriggered(Trigger * t)
@@ -161,7 +185,8 @@ void BaseCommandHandler::commandTemplateDestroyed()
 	if (command != nullptr)
 	{
 		ghostCommandData = command->getJSONData();
-		command->module->templateManager.addBaseManagerListener(this);
+		//DBG("Template destroyed, command data = "+JSON::toString(ghostCommandData));
+		if(command->module != nullptr && command->module->templateManager != nullptr) command->module->templateManager->addBaseManagerListener(this);
 		if (!Engine::mainEngine->isClearing && ModuleManager::getInstanceWithoutCreating() != nullptr) ModuleManager::getInstance()->addBaseManagerListener(this);
 	}
 	setCommand(nullptr);
@@ -169,6 +194,7 @@ void BaseCommandHandler::commandTemplateDestroyed()
 
 void BaseCommandHandler::inspectableDestroyed(Inspectable *)
 {
+    if(isClearing) return;
 	if (command != nullptr) ghostCommandData = command->getJSONData();
 	setCommand(nullptr);
 	if(!Engine::mainEngine->isClearing && ModuleManager::getInstanceWithoutCreating() != nullptr) ModuleManager::getInstance()->addBaseManagerListener(this);
@@ -184,7 +210,7 @@ void BaseCommandHandler::itemAdded(Module * m)
 
 void BaseCommandHandler::itemAdded(CommandTemplate * t)
 {
-	if (command == nullptr && ghostCommandMenuPath == "Templates" && t->shortName == ghostCommandName)
+	if (command == nullptr && ghostCommandMenuPath == "Templates" && t->niceName == ghostCommandName)
 	{
 		Module * m = ModuleManager::getInstance()->getItemWithName(ghostModuleName);
 		if(m != nullptr) setCommand(m->getCommandDefinitionFor(ghostCommandMenuPath, ghostCommandName));

@@ -8,8 +8,8 @@
   ==============================================================================
 */
 
-#ifndef COMMANDDEFINITIONMANAGER_H_INCLUDED
-#define COMMANDDEFINITIONMANAGER_H_INCLUDED
+
+#pragma once
 
 #include "CommandDefinition.h"
 
@@ -21,7 +21,7 @@ public:
 
 	OwnedArray<CommandDefinition> definitions;
 
-	void add(CommandDefinition * def);
+	void add(CommandDefinition* def, int index = -1);
 	void remove(CommandDefinition * def);
 	void clear();
 
@@ -30,7 +30,3 @@ public:
 
 	CommandDefinition * getCommandDefinitionFor(const String &menuPath, const String &moduleType);
 };
-
-
-
-#endif  // COMMANDDEFINITIONMANAGER_H_INCLUDED

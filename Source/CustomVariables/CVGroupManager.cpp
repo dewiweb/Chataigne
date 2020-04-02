@@ -10,12 +10,14 @@
 
 #include "CVGroupManager.h"
 #include "Module/modules/customvariables/CustomVariablesModule.h"
+#include "Preset/CVPresetManager.h"
 
 juce_ImplementSingleton(CVGroupManager)
 
 CVGroupManager::CVGroupManager(const String & name) :
 	BaseManager(name)
 {
+	itemDataType = "CVGroup";
 	module.reset(new CustomVariablesModule(this));
 	addChildControllableContainer(module.get());
 }
@@ -88,11 +90,11 @@ ControllableContainer * CVGroupManager::showMenuAndGetPreset()
 		CVGroup * g = CVGroupManager::getInstance()->items[i];
 
 		PopupMenu sMenu;
-		int numVariables = g->pm.items.size();
+		int numVariables = g->pm->items.size();
 		for (int j = 0; j < numVariables; j++)
 		{
-			presetRefs.add(g->pm.items[j]);
-			sMenu.addItem(itemID, g->pm.items[j]->niceName);
+			presetRefs.add(g->pm->items[j]);
+			sMenu.addItem(itemID, g->pm->items[j]->niceName);
 			itemID++;
 		}
 
@@ -104,6 +106,25 @@ ControllableContainer * CVGroupManager::showMenuAndGetPreset()
 	if (result > 0)
 	{
 		return presetRefs[result - 1];
+	}
+
+	return nullptr;
+}
+
+ControllableContainer* CVGroupManager::showMenuAndGetGroup()
+{
+	PopupMenu menu;
+	int numItems = CVGroupManager::getInstance()->items.size();
+	for (int i = 0; i < numItems; i++)
+	{
+		menu.addItem(i + 1, CVGroupManager::getInstance()->items[i]->niceName);
+	}
+
+	int result = menu.show();
+
+	if (result > 0)
+	{
+		return  CVGroupManager::getInstance()->items[result - 1];
 	}
 
 	return nullptr;

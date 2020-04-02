@@ -10,7 +10,7 @@
 
 #include "CustomOSCCommand.h"
 
-CustomOSCCommand::CustomOSCCommand(CustomOSCModule * module, CommandContext context, var params) :
+CustomOSCCommand::CustomOSCCommand(OSCModule * module, CommandContext context, var params) :
 	OSCCommand(module, context, params),
 	wildcardsContainer("Address Parameters")
 {
@@ -19,9 +19,7 @@ CustomOSCCommand::CustomOSCCommand(CustomOSCModule * module, CommandContext cont
 
 	removeChildControllableContainer(&argumentsContainer);
 	
-	customValuesManager.reset(new CustomValuesCommandArgumentManager(context == MAPPING));
-	addChildControllableContainer(customValuesManager.get());
-	customValuesManager->addArgumentManagerListener(this);
+	setUseCustomValues(true);
 }
 
 CustomOSCCommand::~CustomOSCCommand()
@@ -86,24 +84,6 @@ void CustomOSCCommand::triggerInternal()
 	}
 }
 
-void CustomOSCCommand::useForMappingChanged(CustomValuesCommandArgument *)
-{
-	if (context != MAPPING) return;
-
-	clearTargetMappingParameters();
-	int index = 0;
-    if(customValuesManager == nullptr) return;
-    
-	for (auto &a : customValuesManager->items)
-	{
-		if (a->useForMapping->boolValue())
-		{
-			addTargetMappingParameterAt(a->param, index);
-			index++;
-		}
-	}
-}
-
 void CustomOSCCommand::onContainerParameterChanged(Parameter * p)
 {
 	OSCCommand::onContainerParameterChanged(p);
@@ -124,8 +104,9 @@ void CustomOSCCommand::onContainerParameterChanged(Parameter * p)
 
 var CustomOSCCommand::getJSONData()
 {
-	var data = OSCCommand::getJSONData();
-	data.getDynamicObject()->setProperty("argManager", customValuesManager->getJSONData());
+	var data = BaseCommand::getJSONData(); //do not inherit OSC:Command to avoid saving "arguments"
+	var customValuesData = customValuesManager->getJSONData();
+	if(!customValuesData.isVoid()) data.getDynamicObject()->setProperty("argManager", customValuesData);
 	return data;
 }
 

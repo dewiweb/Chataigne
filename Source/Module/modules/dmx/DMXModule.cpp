@@ -20,13 +20,13 @@ DMXModule::DMXModule() :
 	canHandleRouteValues = true;
 	includeValuesInSave = true;
 
-	defManager.add(CommandDefinition::createDef(this, "", "Black out", &DMXCommand::create)->addParam("action", DMXCommand::BLACK_OUT));
-	defManager.add(CommandDefinition::createDef(this, "", "Set value", &DMXCommand::create)->addParam("action", DMXCommand::SET_VALUE));
-	defManager.add(CommandDefinition::createDef(this, "", "Set value 16bit", &DMXCommand::create)->addParam("action", DMXCommand::SET_VALUE_16BIT));
-	defManager.add(CommandDefinition::createDef(this, "", "Set range", &DMXCommand::create)->addParam("action", DMXCommand::SET_RANGE));
-	defManager.add(CommandDefinition::createDef(this, "", "Set all", &DMXCommand::create)->addParam("action", DMXCommand::SET_ALL));
-	defManager.add(CommandDefinition::createDef(this, "", "Set custom values", &DMXCommand::create)->addParam("action", DMXCommand::SET_CUSTOM));
-	defManager.add(CommandDefinition::createDef(this, "", "Set Color", &DMXCommand::create)->addParam("action",DMXCommand::COLOR));
+	defManager->add(CommandDefinition::createDef(this, "", "Black out", &DMXCommand::create)->addParam("action", DMXCommand::BLACK_OUT));
+	defManager->add(CommandDefinition::createDef(this, "", "Set value", &DMXCommand::create)->addParam("action", DMXCommand::SET_VALUE));
+	defManager->add(CommandDefinition::createDef(this, "", "Set value 16bit", &DMXCommand::create)->addParam("action", DMXCommand::SET_VALUE_16BIT));
+	defManager->add(CommandDefinition::createDef(this, "", "Set range", &DMXCommand::create)->addParam("action", DMXCommand::SET_RANGE));
+	defManager->add(CommandDefinition::createDef(this, "", "Set all", &DMXCommand::create)->addParam("action", DMXCommand::SET_ALL));
+	defManager->add(CommandDefinition::createDef(this, "", "Set custom values", &DMXCommand::create)->addParam("action", DMXCommand::SET_CUSTOM));
+	defManager->add(CommandDefinition::createDef(this, "", "Set Color", &DMXCommand::create)->addParam("action",DMXCommand::COLOR));
 	
 	dmxType = moduleParams.addEnumParameter("DMX Type", "Choose the type of dmx interface you want to connect");
 
@@ -45,6 +45,10 @@ DMXModule::DMXModule() :
 	valuesCC.customUserCreateControllableFunc = &DMXModule::showMenuAndCreateValue;
 
 	setCurrentDMXDevice(DMXDevice::create((DMXDevice::Type)(int)dmxType->getValueData()));
+
+	//Script
+	scriptObject.setMethod(sendDMXId, DMXModule::sendDMXFromScript);
+	//scriptManager->scriptTemplate += ChataigneAssetManager::getInstance()->getScriptTemplate("osc");
 }
 
 DMXModule::~DMXModule()
@@ -136,8 +140,35 @@ void DMXModule::send16BitDMXValues(int startChannel, Array<int> values, DMXByteO
 	dmxDevice->sendDMXRange(startChannel, dmxValues);
 }
 
+var DMXModule::sendDMXFromScript(const var::NativeFunctionArgs& args)
+{
+	DMXModule * m = getObjectFromJS<DMXModule>(args);
+	if (!m->enabled->boolValue()) return var();
+
+	if (args.numArguments < 2) return var();
+
+	int startChannel = args.arguments[0];
+	Array<int> values;
+	for (int i = 1; i < args.numArguments; i++)
+	{
+		if (args.arguments[i].isArray())
+		{
+			for (int j = 0; j < args.arguments[i].size();j++) values.add(args.arguments[i][j]);
+		}
+		else
+		{
+			values.add(args.arguments[i]);
+		}
+	}
+
+	m->sendDMXValues(startChannel, values);
+	return var();
+
+}
+
 void DMXModule::clearItem()
 {
+	BaseItem::clearItem();
 	setCurrentDMXDevice(nullptr);
 }
 
@@ -181,6 +212,8 @@ void DMXModule::dmxDeviceDisconnected()
 
 void DMXModule::dmxDataInChanged(int channel, int value)
 {
+	if (isClearing) return;
+
 	if (logIncomingData->boolValue()) NLOG(niceName, "DMX In : " + String(channel) + " > " + String(value));
 	inActivityTrigger->trigger();
 
@@ -223,10 +256,10 @@ void DMXModule::showMenuAndCreateValue(ControllableContainer * container)
 
 DMXModule::DMXRouteParams::DMXRouteParams(Module * sourceModule, Controllable * c) :
 	mode16bit(nullptr),
-	channel(nullptr),
-	value(nullptr)
+	fullRange(nullptr),
+    channel(nullptr)
 {
-	if (c->type == Controllable::FLOAT || c->type == Controllable::INT || c->type == Controllable::BOOL || c->type == Controllable::POINT2D || c->type == Controllable::POINT3D)
+	if (c->type == Controllable::FLOAT || c->type == Controllable::INT || c->type == Controllable::BOOL || c->type == Controllable::POINT2D || c->type == Controllable::POINT3D || c->type == Controllable::COLOR)
 	{
 		mode16bit = addEnumParameter("Mode", "Choosing the resolution and Byte order for this routing");
 		mode16bit->addOption("8-bit", BIT8)->addOption("16-bit MSB", MSB)->addOption("16-bit LSB", LSB);
@@ -242,60 +275,64 @@ DMXModule::DMXRouteParams::DMXRouteParams(Module * sourceModule, Controllable * 
 
 void DMXModule::handleRoutedModuleValue(Controllable * c, RouteParams * p)
 {
-	DMXRouteParams * rp = dynamic_cast<DMXRouteParams *>(p);
 	
-	Parameter * sp = c->type == Controllable::TRIGGER ? nullptr : dynamic_cast<Parameter *>(c);
+	if (p == nullptr || c == nullptr) return;
 
-	bool fullRange = rp->fullRange != nullptr ? rp->fullRange->boolValue() : false;
-	
-	DMXByteOrder byteOrder = rp->mode16bit->getValueDataAsEnum<DMXByteOrder>();
-
-	switch (c->type)
+	if (DMXRouteParams* rp = dynamic_cast<DMXRouteParams*>(p))
 	{
-	case Controllable::BOOL:
-	case Controllable::INT:
-	case Controllable::FLOAT:
-		if (byteOrder == BIT8) sendDMXValue(rp->channel->intValue(), fullRange?sp->getNormalizedValue()*255:(float)sp->getValue());
-		else send16BitDMXValue(rp->channel->intValue(), fullRange?sp->getNormalizedValue()*65535:(float)sp->getValue(), byteOrder);
+		Parameter* sp = c->type == Controllable::TRIGGER ? nullptr : dynamic_cast<Parameter*>(c);
+
+		bool fullRange = rp->fullRange != nullptr ? rp->fullRange->boolValue() : false;
+
+		DMXByteOrder byteOrder = rp->mode16bit != nullptr ? rp->mode16bit->getValueDataAsEnum<DMXByteOrder>() : DMXByteOrder::BIT8;
+
+		switch (c->type)
+		{
+		case Controllable::BOOL:
+		case Controllable::INT:
+		case Controllable::FLOAT:
+			if (byteOrder == BIT8) sendDMXValue(rp->channel->intValue(), fullRange ? sp->getNormalizedValue() * 255 : (float)sp->getValue());
+			else send16BitDMXValue(rp->channel->intValue(), fullRange ? sp->getNormalizedValue() * 65535 : (float)sp->getValue(), byteOrder);
+			break;
+
+		case Controllable::POINT2D:
+		{
+			Point<float> pp = ((Point2DParameter*)sp)->getPoint();
+			if (fullRange) pp *= byteOrder != BIT8 ? 65535 : 255;
+
+			Array<int> values;
+			values.add((int)pp.x, (int)pp.y);
+
+			if (byteOrder == BIT8) sendDMXValues(rp->channel->intValue(), values);
+			else send16BitDMXValues(rp->channel->intValue(), values, byteOrder);
+		}
 		break;
 
-	case Controllable::POINT2D:
-	{
-		Point<float> pp = ((Point2DParameter *)sp)->getPoint();
-		if (fullRange) pp *= byteOrder != BIT8 ? 65535 : 255;
+		case Controllable::POINT3D:
+		{
+			Vector3D<float> pp = ((Point3DParameter*)sp)->getVector();
+			if (fullRange) pp *= byteOrder != BIT8 ? 65535 : 255;
 
-		Array<int> values;
-		values.add((int)pp.x, (int)pp.y);
+			Array<int> values;
+			values.add((int)pp.x, (int)pp.y, (int)pp.z);
 
-		if (byteOrder == BIT8) sendDMXValues(rp->channel->intValue(), values);
-		else send16BitDMXValues(rp->channel->intValue(), values, byteOrder);
-	}
-	break;
+			if (byteOrder == BIT8) sendDMXValues(rp->channel->intValue(), values);
+			else send16BitDMXValues(rp->channel->intValue(), values, byteOrder);
+		}
+		break;
 
-	case Controllable::POINT3D:
-	{
-		Vector3D<float> pp = ((Point3DParameter *)sp)->getVector();
-		if (fullRange) pp *= byteOrder != BIT8 ? 65535 : 255;
+		case Controllable::COLOR:
+		{
+			Colour col = ((ColorParameter*)sp)->getColor();
+			Array<int> values;
+			values.add(col.getRed(), col.getGreen(), col.getBlue());
+			sendDMXValues(rp->channel->intValue(), values);
+		}
 
-		Array<int> values;
-		values.add((int)pp.x, (int)pp.y, (int)pp.z);
+		break;
 
-		if (byteOrder == BIT8) sendDMXValues(rp->channel->intValue(), values);
-		else send16BitDMXValues(rp->channel->intValue(), values, byteOrder);
-	}
-	break;
-
-	case Controllable::COLOR:
-	{
-		Colour col = ((ColorParameter *)sp)->getColor();
-		Array<int> values;
-		values.add(col.getRed(), col.getGreen(), col.getBlue());
-		sendDMXValues(rp->channel->intValue(), values);
-	}
-
-	break;
-            
-        default:
-            break;
+		default:
+			break;
+		}
 	}
 }

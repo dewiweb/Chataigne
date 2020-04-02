@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CustomValuesCommandARGUMENT_H_INCLUDED
-#define CustomValuesCommandARGUMENT_H_INCLUDED
+#pragma once
 
 #include "JuceHeader.h"
 
@@ -36,7 +35,7 @@ public:
 
 	void onContainerParameterChangedInternal(Parameter * p) override;
 	void onExternalParameterValueChanged(Parameter * p) override;
-
+	void onExternalParameterRangeChanged(Parameter* p) override;
 
 
 	var getJSONData() override;
@@ -58,9 +57,4 @@ public:
 
 	InspectableEditor * getEditor(bool isRoot) override;
 
-
 };
-
-
-
-#endif  // CustomValuesCommandARGUMENT_H_INCLUDED

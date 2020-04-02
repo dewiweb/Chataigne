@@ -10,7 +10,6 @@
 
 #include "CustomOSCModule.h"
 #include "Common/Command/CommandFactory.h"
-#include "commands/CustomOSCCommand.h"
 
 
 CustomOSCModule::CustomOSCModule() :
@@ -21,13 +20,11 @@ CustomOSCModule::CustomOSCModule() :
 
 	autoAdd = moduleParams.addBoolParameter("Auto Add", "Add automatically any message that is received\nand try to create the corresponding value depending on the message content.", true);
 	splitArgs = moduleParams.addBoolParameter("Split Arguments", "If checked, a message with multiple arguments will be exploded in multliple values", false);
-	autoRange = moduleParams.addBoolParameter("Auto Range", "If checked, parameters with potential range like numbers will automatically have the range of the minimum and maximum received values", false);
 	autoFeedback = moduleParams.addBoolParameter("Auto Feedback", "If checked, all changed values will be automatically sent back to the outputs", false);
 
 	valuesCC.userCanAddControllables = true;
 	valuesCC.customUserCreateControllableFunc = &CustomOSCModule::showMenuAndCreateValue;
 	
-	defManager.add(CommandDefinition::createDef(this, "", "Custom Message", &CustomOSCCommand::create));
 	
 }
 
@@ -45,7 +42,7 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 	{
 		for (int i = 0; i < msg.size(); i++) 
 		{
-			c = valuesCC.getControllableByName(cShortName+" "+String(i));
+			c = valuesCC.getControllableByName(cShortName+"_"+String(i));
 			Parameter * p = (Parameter *)c;
 			if (c != nullptr) //Args already exists
 			{
@@ -63,23 +60,19 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 				String argIAddress = cNiceName + " " + String(i);
 				if (msg[i].isInt32())
 				{
-					if(autoRange->boolValue()) c = valuesCC.addIntParameter(argIAddress, "", msg[i].getInt32(), msg[i].getInt32(), msg[i].getInt32() + 1);
-					else c = valuesCC.addIntParameter(argIAddress, "", msg[i].getInt32());
+					c = valuesCC.addIntParameter(argIAddress, "", msg[i].getInt32());
 				} else if (msg[i].isFloat32())
 				{
-					if (autoRange->boolValue()) c = valuesCC.addFloatParameter(argIAddress, "", msg[i].getFloat32(), msg[i].getFloat32(), msg[i].getFloat32());
-					else c = valuesCC.addFloatParameter(argIAddress, "", msg[i].getFloat32());
+					c = valuesCC.addFloatParameter(argIAddress, "", msg[i].getFloat32());
 				} else if (msg[i].isString()) c = valuesCC.addStringParameter(argIAddress, "", msg[i].getString());
 
 
 				if (c != nullptr) //Args have been sucessfully created 
 				{
-					c->setCustomShortName(cShortName + " " + String(i)); //force safeName for search
+					c->setCustomShortName(cShortName + "_" + String(i)); //force safeName for search
 					c->isCustomizableByUser = true;
 					c->isRemovableByUser = true;
 					c->saveValueOnly = false;
-					//c->isControllableFeedbackOnly = true;
-					if (c->type != Controllable::TRIGGER) ((Parameter *)c)->autoAdaptRange = true;
 				}
 			}
 		}
@@ -90,8 +83,6 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 		
 		if (c != nullptr) //update existing controllable
 		{
-			if (c->type != Controllable::TRIGGER) ((Parameter *)c)->autoAdaptRange = true;
-
 			switch (c->type)
 			{
 			case Controllable::TRIGGER:
@@ -158,12 +149,10 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 		case 1:
 			if (msg[0].isInt32())
 			{
-				if(autoRange->boolValue()) c = new IntParameter(cNiceName, "", msg[0].getInt32(), msg[0].getInt32(), msg[0].getInt32());
-				else  c = new IntParameter(cNiceName, "", msg[0].getInt32());
+				c = new IntParameter(cNiceName, "", msg[0].getInt32());
 			} else if (msg[0].isFloat32())
 			{
-				if (autoRange->boolValue()) c = new FloatParameter(cNiceName, "", msg[0].getFloat32(), msg[0].getFloat32(), msg[0].getFloat32());
-				else c = new FloatParameter(cNiceName, "", msg[0].getFloat32());
+				c = new FloatParameter(cNiceName, "", msg[0].getFloat32());
 			} else if (msg[0].isString()) c = new StringParameter(cNiceName, "", msg[0].getString());
 
 			break;
@@ -172,8 +161,7 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 			//duplicate because may have other mechanism
 			if (msg[0].isInt32())
 			{
-				if(autoRange->boolValue()) c = new IntParameter(cNiceName, "", getIntArg(msg[0]), getIntArg(msg[1]), getIntArg(msg[1]) + 1);
-				else c = new IntParameter(cNiceName, "", getIntArg(msg[0]));
+				c = new IntParameter(cNiceName, "", getIntArg(msg[0]));
 			} else if (msg[0].isFloat32())
 			{
 				c = new Point2DParameter(cNiceName, "");
@@ -221,8 +209,6 @@ void CustomOSCModule::processMessageInternal(const OSCMessage & msg)
 			c->saveValueOnly = false;
 			//c->setControllableFeedbackOnly(true);
 
-			if (c->type != Controllable::TRIGGER && autoRange->boolValue()) ((Parameter *)c)->autoAdaptRange = true;
-
 			valuesCC.addControllable(c);
 			valuesCC.orderControllablesAlphabetically();
 		}
@@ -248,7 +234,16 @@ void CustomOSCModule::onControllableFeedbackUpdateInternal(ControllableContainer
 					if (p != nullptr)
 					{
 						if (c->type == Controllable::COLOR) m.addArgument(varToColorArgument(p->value));
-						m.addArgument(varToArgument(p->value));
+						else if (p->value.isArray())
+						{
+
+							Array<var>* arr = p->value.getArray();
+							for (auto& aa : *arr) m.addArgument(varToArgument(aa));
+						}
+						else
+						{
+							m.addArgument(varToArgument(p->value));
+						}
 					}
 				}
 

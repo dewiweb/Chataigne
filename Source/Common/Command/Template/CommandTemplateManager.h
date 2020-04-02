@@ -35,9 +35,14 @@ public:
 
 	CommandTemplate * addItemFromData(var data, bool addToUndo = true) override;
 
-	void setupTemplateDefinition();
+	void setupDefinitionsFromModule();
+
+	void setItemIndex(CommandTemplate* t, int newIndex) override;
+	void reorderItems() override;
+	void reorderDefinitions();
 
 	void templateNameChanged(CommandTemplate * ct) override;
+	void loadJSONDataManagerInternal(var data) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CommandTemplateManager)
 };

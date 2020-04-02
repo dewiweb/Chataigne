@@ -13,7 +13,7 @@
 
 OSCOutputEditor::OSCOutputEditor(OSCOutput * output, bool isRoot) :
 	BaseItemEditor(output, isRoot),
-	zeroconfMenu("Auto set...")
+	zeroconfMenu("Auto detect")
 {
 	addAndMakeVisible(&zeroconfMenu);
 	zeroconfMenu.addListener(this);
@@ -25,7 +25,7 @@ OSCOutputEditor::~OSCOutputEditor()
 
 void OSCOutputEditor::resizedInternalHeaderItemInternal(Rectangle<int>& r)
 {
-	zeroconfMenu.setBounds(r.removeFromRight(60).reduced(1));
+	zeroconfMenu.setBounds(r.removeFromRight(60).reduced(0,2));
 }
 
 void OSCOutputEditor::showMenuAndSetupOutput()

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MIDIDEVICE_H_INCLUDED
-#define MIDIDEVICE_H_INCLUDED
+#pragma once
 
 #include "JuceHeader.h"
 
@@ -46,7 +45,12 @@ public:
 		virtual void noteOffReceived(const int &/*channel*/, const int &/*pitch*/, const int &/*velocity*/) {}
 		virtual void controlChangeReceived(const int &/*channel*/, const int &/*number*/, const int &/*value*/) {}
 		virtual void sysExReceived(const MidiMessage &/*msg*/) {}
-		virtual void fullFrameTimecodeReceived(const MidiMessage &/*msg*/){}
+		virtual void fullFrameTimecodeReceived(const MidiMessage&/*msg*/) {}
+		virtual void quarterFrameTimecodeReceived(const MidiMessage&/*msg*/) {}
+		virtual void pitchWheelReceived(const int&/*channel*/, const int&/*value*/) {}
+		virtual void channelPressureReceived(const int&/*channel*/, const int&/*value*/) {}
+		virtual void afterTouchReceived(const int &/*channel*/, const int & /*note*/, const int &/*value*/){}
+		virtual void midiMessageReceived(const MidiMessage& message) {}
 	};
 
 	ListenerList<MIDIInputListener> inputListeners;
@@ -75,14 +79,14 @@ public:
 	void sendNoteOn(int channel, int pitch, int velocity);
 	void sendNoteOff(int channel, int pitch);
 	void sendControlChange(int channel, int number, int value);
+	void sendProgramChange(int channel, int number);
 	void sendSysEx(Array<uint8> data);
 	void sendFullframeTimecode(int hours, int minutes, int seconds, int frames, MidiMessage::SmpteTimecodeType timecodeType);
 	void sendQuarterframe(int piece, int value);
 	void sendMidiMachineControlCommand(MidiMessage::MidiMachineControlCommand command);
+	void sendPitchWheel(int channel, int value);
+	void sendChannelPressure(int channel, int value);
+	void sendAfterTouch(int channel, int note, int value);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MIDIOutputDevice)
 };
-
-
-
-#endif  // MIDIDEVICE_H_INCLUDED

@@ -7,9 +7,7 @@
 
   ==============================================================================
 */
-
-#ifndef CustomValuesCommandARGUMENTMANAGEREDITOR_H_INCLUDED
-#define CustomValuesCommandARGUMENTMANAGEREDITOR_H_INCLUDED
+#pragma once
 
 #include "../CustomValuesCommandArgumentManager.h"
 
@@ -18,13 +16,12 @@ class CustomValuesCommandArgumentManagerEditor :
 {
 public:
 	CustomValuesCommandArgumentManagerEditor(CustomValuesCommandArgumentManager * manager, bool isRoot);
-	~CustomValuesCommandArgumentManagerEditor() {};
+	virtual ~CustomValuesCommandArgumentManagerEditor() {};
 
 	CustomValuesCommandArgumentManager * aManager;
 
-	void showMenuAndAddItem(bool) override;
+	virtual void addPopupMenuItems(PopupMenu* p) override;
+	virtual void handleMenuSelectedID(int id) override;
+
+	virtual void showMenuAndAddItem(bool) override;
 };
-
-
-
-#endif  // CustomValuesCommandARGUMENTMANAGEREDITOR_H_INCLUDED

@@ -10,32 +10,35 @@
 
 #include "CurveMapFilter.h"
 
+
 CurveMapFilter::CurveMapFilter(var params) :
 	MappingFilter(getTypeString(), params),
 	curve("Curve")
 {
 	curve.isSelectable = false;
 	curve.length->setValue(1);
-	curve.addItem(0, 0, false);
+	curve.addKey(0, 0, false);
 	curve.items[0]->easingType->setValueWithData(Easing::BEZIER);
-	curve.addItem(1, 1, false);
-	curve.enableSnap->setValue(false);
-	curve.showUIInEditor = true;
+	curve.addKey(1, 1, false);
+	//curve.enableSnap->setValue(false);
 	curve.selectItemWhenCreated = false;
 	curve.hideEditorHeader = true;
 	filterParams.addChildControllableContainer(&curve);
 
-	forceOutParameterType = FloatParameter::getTypeStringStatic();
+
+	filterTypeFilters.add(Controllable::INT, Controllable::FLOAT);
 }
 
 CurveMapFilter::~CurveMapFilter()
 {
 }
 
-void CurveMapFilter::processInternal()
+void CurveMapFilter::processSingleParameterInternal(Parameter * source, Parameter * out)
 {
-	curve.position->setValue(sourceParam->getNormalizedValue());
-	filteredParameter->setNormalizedValue(curve.value->floatValue());
+	if(source == sourceParams.getFirst()) curve.position->setValue(source->getNormalizedValue());
+
+	if (source->hasRange()) out->setNormalizedValue(curve.getValueAtPosition(source->getNormalizedValue()));
+	else out->setValue(source->getValue());
 }
 
 void CurveMapFilter::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
@@ -47,13 +50,12 @@ void CurveMapFilter::onControllableFeedbackUpdateInternal(ControllableContainer 
 var CurveMapFilter::getJSONData()
 {
 	var data = MappingFilter::getJSONData();
-	data.getDynamicObject()->setProperty("curve", curve.getJSONData());
+	data.getDynamicObject()->setProperty(curve.shortName, curve.getJSONData());
 	return data;
 }
 
 void CurveMapFilter::loadJSONDataInternal(var data)
 {
 	MappingFilter::loadJSONDataInternal(data);
-	curve.loadJSONData(data.getProperty("curve", var()), true);
+	curve.loadJSONData(data.getProperty(curve.shortName, var()), true);
 }
-

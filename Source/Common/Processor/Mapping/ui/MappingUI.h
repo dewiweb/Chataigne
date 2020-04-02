@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MAPPINGUI_H_INCLUDED
-#define MAPPINGUI_H_INCLUDED
+#pragma once
 
 #include "../Mapping.h"
 #include "../../ui/ProcessorUI.h"
@@ -37,10 +36,8 @@ public:
 
 	void newMessage(const Mapping::MappingEvent &e) override;
 
+	virtual void addContextMenuItems(PopupMenu& p) override;
+	virtual void handleContextMenuResult(int result) override;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingUI)
 };
-
-
-
-
-#endif  // MAPPINGUI_H_INCLUDED

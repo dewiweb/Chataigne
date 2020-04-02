@@ -9,12 +9,13 @@
 #include "MainComponent.h"
 #include "Module/ui/ModuleManagerUI.h"
 #include "StateMachine/ui/StateMachineView.h"
-#include "TimeMachine/ui/TimeMachineView.h"
 #include "Module/Routing/ui/ModuleRouterPanelView.h"
 #include "StateMachine/ui/StateManagerUI.h"
-#include "TimeMachine/ui/SequenceManagerUI.h"
 #include "CustomVariables/ui/CVGroupManagerUI.h"
+#include "CustomVariables/Preset/Morpher/ui/MorpherViewUI.h"
 #include "Common/Command/Template/ui/CommandTemplateManagerUI.h"
+#include "TimeMachine/ChataigneSequenceManager.h"
+#include "UI/WelcomeScreen.h"
 
 String getAppVersion();
 
@@ -36,8 +37,9 @@ void MainContentComponent::init()
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Modules", &ModuleManagerUI::create));
 
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Custom Variables", &CVGroupManagerUI::create));
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Morpher", &MorpherPanel::create));
 
-	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Sequences", &SequenceManagerUI::create));
+	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Sequences", &createSequenceManagerUI));
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("Sequence Editor", &TimeMachineView::create));
 
 	ShapeShifterFactory::getInstance()->defs.add(new ShapeShifterDefinition("States", &StateManagerUI::create));
@@ -48,5 +50,17 @@ void MainContentComponent::init()
 
 	OrganicMainContentComponent::init();
 
+	String lastVersion = getAppProperties().getUserSettings()->getValue("lastVersion", "");
 
+	if (lastVersion != getAppVersion())
+	{
+		WelcomeScreen w;
+		DialogWindow::showModalDialog("Welcome", &w, getTopLevelComponent(), Colours::black, true);
+	}
+
+
+}
+SequenceManagerUI* MainContentComponent::createSequenceManagerUI(const String& name) 
+{
+	return SequenceManagerUI::create(name, ChataigneSequenceManager::getInstance());
 }

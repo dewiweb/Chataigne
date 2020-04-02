@@ -17,11 +17,15 @@ HTTPCommand::HTTPCommand(HTTPModule * _module, CommandContext context, var param
 	method = addEnumParameter("Method", "Request Method");
 	method->addOption("GET", HTTPModule::GET)->addOption("POST", HTTPModule::POST);
 
+	resultDataType = addEnumParameter("Result Type", "The type of data to parse the received data");
+	resultDataType->addOption("Raw", HTTPModule::RAW)->addOption("JSON", HTTPModule::JSON);
+
 	address = addStringParameter("Address", "Address to append to the module's base address", "anything");
 
-	customValuesManager.reset(new CustomValuesCommandArgumentManager(context == MAPPING));
-	addChildControllableContainer(customValuesManager.get());
-	customValuesManager->addArgumentManagerListener(this);
+	setUseCustomValues(true);
+
+	extraHeaders = addStringParameter("Extra Headers", "HTTP headers to add to the request", "");
+	extraHeaders->multiline = true;
 }
 
 HTTPCommand::~HTTPCommand()
@@ -32,22 +36,9 @@ HTTPCommand::~HTTPCommand()
 void HTTPCommand::triggerInternal()
 {
 	StringPairArray requestParams;
-	for (auto &p : customValuesManager->items) requestParams.set(p->shortName, p->param->stringValue());
-	httpModule->sendRequest(address->stringValue(), method->getValueDataAsEnum<HTTPModule::RequestMethod>(), requestParams);
-}
-
-void HTTPCommand::useForMappingChanged(CustomValuesCommandArgument *)
-{
-	if (context != CommandContext::MAPPING) return;
-
-	clearTargetMappingParameters();
-	int index = 0;
-	for (auto &a : customValuesManager->items)
-	{
-		if (a->useForMapping != nullptr && a->useForMapping->boolValue())
-		{
-			addTargetMappingParameterAt(a->param, index);
-			index++;
-		}
-	}
+	for (auto &p : customValuesManager->items) requestParams.set(p->niceName, p->param->stringValue());
+	
+	StringPairArray headers;
+	
+	httpModule->sendRequest(address->stringValue(), method->getValueDataAsEnum<HTTPModule::RequestMethod>(), resultDataType->getValueDataAsEnum<HTTPModule::ResultDataType>(), requestParams, extraHeaders->stringValue());
 }

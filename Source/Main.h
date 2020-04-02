@@ -13,8 +13,7 @@
 
 #include "MainComponent.h"
 #include "ChataigneEngine.h"
-#include "Analytics/GoogleAnalyticsDestination.h"
-#include "Analytics/MatamoAnalytics.h"
+#include "Analytics/MatomoAnalytics.h"
 
 //==============================================================================
 class ChataigneApplication : public OrganicApplication
@@ -32,6 +31,5 @@ public:
 
 	void shutdown() override;
 };
-
 
 START_JUCE_APPLICATION(ChataigneApplication)

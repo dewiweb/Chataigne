@@ -10,14 +10,24 @@
 
 #include "CustomVariablesModuleCommands.h"
 
+#include "../CustomVariablesModule.h"
+#include "CustomVariables/CVGroupManager.h"
+#include "CustomVariables/Preset/CVPresetManager.h"
+
 CVCommand::CVCommand(CustomVariablesModule * _module, CommandContext context, var params) :
 	BaseCommand(_module, context, params),
 	target(nullptr),
 	targetPreset(nullptr),
 	targetPreset2(nullptr),
-	valueOperator(nullptr),
-	value(nullptr)
+	presetFile(nullptr),
+	time(nullptr),
+    automation(nullptr),
+    valueOperator(nullptr),
+    value(nullptr)
+
 {
+	saveAndLoadRecursiveData = true;
+
 	type = (Type)(int)params.getProperty("type", 0);
 	manager = _module->manager;
 
@@ -29,17 +39,19 @@ CVCommand::CVCommand(CustomVariablesModule * _module, CommandContext context, va
 		
 		valueOperator = addEnumParameter("Operator", "The operator to apply. If you simply want to set the value, leave at the = option.", false);
 		
-	} else if (type == SET_2DTARGET)
+	} else if (type == SET_2DTARGET || type == KILL_GO_TO_PRESET)
 	{
 		target = addTargetParameter("Target Group", "The group to target for this command", CVGroupManager::getInstance());
 		target->targetType = TargetParameter::CONTAINER;
-		target->defaultContainerTypeCheckFunc = &ContainerTypeChecker::checkType<CVGroup>;
-		target->maxDefaultSearchLevel = 1;
+		target->customGetTargetContainerFunc = &CVGroupManager::showMenuAndGetGroup;
 		target->showParentNameInEditor = false;
-		value = addPoint2DParameter("Position", "The target position in the 2D interpolator");
-		addTargetMappingParameterAt(value, 0);
 
-	} else if (type == SET_PRESET || type == LERP_PRESETS || type == SET_PRESET_WEIGHT)
+		if (type == SET_2DTARGET)
+		{
+			value = addPoint2DParameter("Position", "The target position in the 2D interpolator");
+			addTargetMappingParameterAt(value, 0);
+		}
+	} else if (type == SET_PRESET || type == LERP_PRESETS || type == SET_PRESET_WEIGHT || type == SAVE_PRESET || type == LOAD_PRESET || type == GO_TO_PRESET)
 	{
 		targetPreset = addTargetParameter("Target Preset", "The Preset to get the values from and set the variables to", CVGroupManager::getInstance());
 		targetPreset->targetType = TargetParameter::CONTAINER;
@@ -48,6 +60,17 @@ CVCommand::CVCommand(CustomVariablesModule * _module, CommandContext context, va
 
 		switch (type)
 		{
+
+		case GO_TO_PRESET:
+			time = addFloatParameter("Interpolation time", "Time for the animation to go to the target preset", 1, 0);
+			time->defaultUI = FloatParameter::TIME;
+			automation = new Automation("Curve");
+			automation->addKey(0, 0, false);
+			automation->addKey(1, 1, false);
+			automation->items[0]->setEasing(Easing::BEZIER);
+			addChildControllableContainer(automation, true);
+			break;
+
 		case LERP_PRESETS:
 		{
 			targetPreset2 = addTargetParameter("Target Preset 2", "The second preset to use for the interpolation", CVGroupManager::getInstance());
@@ -66,6 +89,13 @@ CVCommand::CVCommand(CustomVariablesModule * _module, CommandContext context, va
 		}
 		break;
 
+		case LOAD_PRESET:
+		case SAVE_PRESET:
+		{
+			presetFile = addFileParameter("File", "The file to save/load the preset to/from");
+		}
+		break;
+
 		default:
 			break;
 		}
@@ -79,25 +109,29 @@ CVCommand::~CVCommand()
 
 void CVCommand::updateOperatorOptions()
 {
+	var oldData = valueOperator->getValueData();
 	valueOperator->clearOptions();
-	valueOperator->addOption("Equals", EQUAL);
+	valueOperator->addOption("Equals", EQUAL, false);
 
 	switch (value->type)
 	{
 	case Controllable::FLOAT:
 	case Controllable::INT:
-		valueOperator->addOption("Add", ADD)->addOption("Inverse", INVERSE)->addOption("Subtract", SUBTRACT)->addOption("Multiply", MULTIPLY)->addOption("Divide", DIVIDE);
+		valueOperator->addOption("Add", ADD, false)->addOption("Inverse", INVERSE, false)->addOption("Subtract", SUBTRACT, false)->addOption("Multiply", MULTIPLY, false)->addOption("Divide", DIVIDE, false);
 		break;
 
 	case Controllable::BOOL:
-		valueOperator->addOption("Inverse", INVERSE);
+		valueOperator->addOption("Inverse", INVERSE, false);
 		break;
 
 	default:
 		break;
 	}
 	
+	valueOperator->setValueWithData(oldData.isVoid()?EQUAL:(Operator)(int)(oldData));
 	valueOperator->setEnabled(valueOperator->getAllKeys().size() > 1);
+
+	value->hideInEditor = valueOperator->getValueDataAsEnum<Operator>() == INVERSE;
 }
 
 void CVCommand::onContainerParameterChanged(Parameter * p)
@@ -106,16 +140,21 @@ void CVCommand::onContainerParameterChanged(Parameter * p)
 	{
 		if (value != nullptr)
 		{
+			ghostValueData = value->getJSONData();
 			clearTargetMappingParameters();
 			removeControllable(value);
 		}
 
-		value = ControllableFactory::createParameterFrom(target->target);
+		if (target->target != nullptr) value = ControllableFactory::createParameterFrom(target->target);
+		else value = nullptr;
+
 		if (value != nullptr)
 		{
 			updateOperatorOptions();
-			
+
+			if (!ghostValueData.isVoid()) value->loadJSONData(ghostValueData);
 			value->setNiceName("Value");
+		
 			addParameter(value);
 			addTargetMappingParameterAt(value, 0);
 		}
@@ -133,7 +172,9 @@ void CVCommand::onContainerParameterChanged(Parameter * p)
 		if (value != nullptr)
 		{
 			Operator o = valueOperator->getValueDataAsEnum<Operator>();
+			bool curHide = value->hideInEditor;
 			value->hideInEditor = o == INVERSE;
+			if (curHide != value->hideInEditor) queuedNotifier.addMessage(new ContainerAsyncEvent(ContainerAsyncEvent::ControllableContainerNeedsRebuild, this));
 		}
 	}
 }
@@ -192,6 +233,26 @@ void CVCommand::triggerInternal()
 	}
 	break;
 
+	case GO_TO_PRESET:
+	{
+		if (targetPreset->targetContainer != nullptr)
+		{
+			CVPreset* p1 = static_cast<CVPreset*>(targetPreset->targetContainer.get());
+			p1->group->goToPreset(p1, time->floatValue(), automation);
+		}
+	}
+	break;
+
+	case KILL_GO_TO_PRESET:
+	{
+		if (!target->targetContainer.wasObjectDeleted() && target->targetContainer != nullptr)
+		{
+			CVGroup* g = dynamic_cast<CVGroup*>(target->targetContainer.get());
+			g->stopInterpolation();
+		}
+	}
+	break;
+
 	case LERP_PRESETS:
 	{
 		if (targetPreset->targetContainer != nullptr && targetPreset2->targetContainer != nullptr)
@@ -221,14 +282,52 @@ void CVCommand::triggerInternal()
 
 	case SET_2DTARGET:
 	{
-		if (target->targetContainer != nullptr)
+		if (!target->targetContainer.wasObjectDeleted() && target->targetContainer != nullptr)
 		{
 			CVGroup * g = static_cast<CVGroup *>(target->targetContainer.get());
-			if (g != nullptr) g->targetPosition->setPoint(((Point2DParameter *)value)->getPoint());
+			if (g != nullptr && g->morpher != nullptr) g->morpher->targetPosition->setPoint(((Point2DParameter *)value)->getPoint());
 		}
 	}
 	break;
+
+	case LOAD_PRESET:
+	case SAVE_PRESET:
+	{
+		if (targetPreset->targetContainer != nullptr)
+		{
+			CVPreset* p = static_cast<CVPreset*>(targetPreset->targetContainer.get());
+			if (p != nullptr)
+			{
+				File f = presetFile->getFile();
+				if (type == LOAD_PRESET)
+				{
+					if (f.exists())
+					{
+						std::unique_ptr<InputStream> is(f.createInputStream());
+						var data = JSON::fromString(is->readEntireStreamAsString());
+						p->loadValuesFromJSON(data);
+					}
+					else
+					{
+						NLOGWARNING(niceName, "Preset file does not exist");
+					}
+				}
+				else if (type == SAVE_PRESET)
+				{
+					if (f.exists()) f.deleteFile();
+
+					var data = p->getValuesAsJSON();
+					std::unique_ptr<OutputStream> os(f.createOutputStream());
+					JSON::writeToStream(*os, data);
+					os->flush();
+				}
+			}
+		}
 	}
+	break;
+
+	}
+
 }
 
 BaseCommand * CVCommand::create(ControllableContainer * module, CommandContext context, var params)

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SERIALDEVICE_H_INCLUDED
-#define SERIALDEVICE_H_INCLUDED
+#pragma once
 
 #define SYNCHRONOUS_SERIAL_LISTENERS
 
@@ -104,7 +103,7 @@ public:
 	bool isOpen();
 
 	//write functions
-	int writeString(String message, bool endLine = true);
+	int writeString(String message);
 	int writeBytes(Array<uint8_t> data);
 
 	virtual void dataReceived(const var &data) override;
@@ -125,9 +124,3 @@ public:
 	void addSerialDeviceListener(SerialDeviceListener* newListener);
 	void removeSerialDeviceListener(SerialDeviceListener* listener);
 };
-
-
-
-
-
-#endif  // SERIALDEVICE_H_INCLUDED

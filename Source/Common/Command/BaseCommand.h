@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASECOMMAND_H_INCLUDED
-#define BASECOMMAND_H_INCLUDED
+#pragma once
 
 #include "Template/CommandTemplate.h"
 #include "CommandContext.h"
@@ -20,7 +19,9 @@ class Module;
 class BaseCommand :
 	public ControllableContainer,
 	public Inspectable::InspectableListener,
-	public CommandTemplate::TemplateListener
+	public CommandTemplate::TemplateListener,
+	public CustomValuesCommandArgumentManager::ArgumentManagerListener,
+	public CustomValuesCommandArgumentManager::ManagerListener
 {
 public:
 	BaseCommand(Module * module, CommandContext context, var params);
@@ -43,6 +44,7 @@ public:
 	HashMap<int, Array<WeakReference<Parameter>> *> targetMappingParameters;
 	HashMap<Parameter *, int> parameterToIndexMap;
 
+
 	void addTargetMappingParameterAt(WeakReference<Parameter> p,int index);
 	void removeTargetMappingParameter(WeakReference<Parameter> p);
 	void clearTargetMappingParametersAt(int index);
@@ -53,12 +55,17 @@ public:
 	void updateParameterFromTemplate(CommandTemplateParameter * ctp);
 	virtual void setupTemplateParameters(CommandTemplate * ct);
 
+	void setUseCustomValues(bool value);
+	virtual void useForMappingChanged(CustomValuesCommandArgument*) override;
+	virtual void itemsReordered() override;
+
 	void templateParameterChanged(CommandTemplateParameter * ctp) override;
 	
 	virtual void setMappingValueType(Controllable::Type type);
     virtual void trigger(); //for trigger, will check validity of module
     virtual void triggerInternal() {} // to be overriden
 	virtual void setValue(var value); //for mapping context
+	virtual void setValueInternal(var value) {}
 
 	virtual void loadPreviousCommandData(var data) { } //default behavior is nothing, can override that to trying hot swap of commands
 	
@@ -67,11 +74,9 @@ public:
 
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
-
-
+	void  afterLoadJSONDataInternal() override;
 
 	static BaseCommand * create(ControllableContainer * module, CommandContext context, var params);
-
 
 	class CommandListener
 	{
@@ -90,5 +95,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseCommand)
 };
-
-#endif  // BASECOMMAND_H_INCLUDED

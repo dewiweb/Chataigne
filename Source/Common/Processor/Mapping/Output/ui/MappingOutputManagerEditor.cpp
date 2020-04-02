@@ -31,9 +31,10 @@ void MappingOutputManagerEditor::updateOutputUI()
 		outUI = nullptr;
 	}
 
-	if (outputManager->outParam != nullptr)
+	if (outputManager->outParams.size() > 0 && outputManager->outParams[0] != nullptr)
 	{
-		outUI.reset((ParameterUI*)outputManager->outParam->createDefaultUI());
+		outUI.reset((ParameterUI*)outputManager->outParams[0]->createDefaultUI());
+		outUI->showLabel = false;
 		addAndMakeVisible(outUI.get());
 	}
 
@@ -43,7 +44,7 @@ void MappingOutputManagerEditor::updateOutputUI()
 void MappingOutputManagerEditor::resizedInternalHeader(Rectangle<int>& r)
 {
 	BaseCommandHandlerManagerEditor::resizedInternalHeader(r);
-	if (outUI != nullptr) outUI->setBounds(r.removeFromRight(120).reduced(3));
+	if (outUI != nullptr) outUI->setBounds(r.removeFromRight(140).reduced(3));
 }
 
 void MappingOutputManagerEditor::newMessage(const MappingOutputManager::OutputManagerEvent & e)

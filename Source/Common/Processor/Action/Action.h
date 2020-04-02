@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef ACTION_H_INCLUDED
-#define ACTION_H_INCLUDED
+#pragma once
 
 #include "../Processor.h"
 #include "Condition/ConditionManager.h"
@@ -18,8 +17,9 @@
 class Action :
 	public Processor,
 	public ConditionManager::ConditionManagerListener,
-	public ConditionManager::Listener,
-	public Condition::ConditionListener
+	public ConditionManager::ManagerListener,
+	public Condition::ConditionListener,
+	public EngineListener
 {
 public:
 	Action(const String &name = "Action", var params = var());
@@ -37,18 +37,18 @@ public:
 	std::unique_ptr<ConsequenceManager> csmOn;
 	std::unique_ptr<ConsequenceManager> csmOff;
 
-	BoolParameter * isActive;
 	Trigger * triggerOn;
 	Trigger * triggerOff;
 
 	void updateConditionRoles();
 
-	virtual void setForceDisabled(bool value, bool force = false) override;
 	void setHasOffConsequences(bool value);
 
+    virtual void updateDisables(bool force = false) override;
 
 	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	void loadJSONDataItemInternal(var data) override;
+	void endLoadFile() override;
 
 	void onContainerParameterChangedInternal(Parameter * p) override;
 	void onContainerTriggerTriggered(Trigger *) override;
@@ -101,9 +101,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Action)
 };
-
-
-
-
-
-#endif  // ACTION_H_INCLUDED

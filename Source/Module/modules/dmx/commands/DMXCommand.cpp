@@ -65,17 +65,15 @@ DMXCommand::DMXCommand(DMXModule* _module, CommandContext context, var params) :
 	case SET_CUSTOM:
 	{
 		channel = addIntParameter("Start Channel", "First DMX Channel", 1, 1, 512);
-		customValuesManager.reset(new CustomValuesCommandArgumentManager(context == MAPPING));
-		customValuesManager->allowedTypes.add(Controllable::INT); 
-		addChildControllableContainer(customValuesManager.get());
-		customValuesManager->addArgumentManagerListener(this);
+		setUseCustomValues(true);
+		customValuesManager->allowedTypes.add(Controllable::INT);
 		customValuesManager->addBaseManagerListener(this);
 	}
 	break;
 	}
 
 
-	if (context == MAPPING && (dmxAction == SET_VALUE || dmxAction == SET_VALUE_16BIT || dmxAction == SET_RANGE))
+	if (context == MAPPING && (dmxAction == SET_VALUE || dmxAction == SET_VALUE_16BIT || dmxAction == SET_RANGE || dmxAction == SET_CUSTOM))
 	{
 		remap01To255 = addBoolParameter("Remap to 0-255", "If checked, this will automatically remap values from 0-1 to 0-255", false);
 	}
@@ -88,11 +86,30 @@ DMXCommand::~DMXCommand()
 
 void DMXCommand::setValue(var val)
 {
-	float mapFactor = (remap01To255 != nullptr && remap01To255->boolValue()) ? 255 : 1;
-	if (val.isArray()) val[0] = (float)val[0] * mapFactor;
-	else val = (float)val * mapFactor;
+	//DBG("Value val " << (int)val.isArray() << " / " << val.size()) ;
 
-	BaseCommand::setValue(val); 
+	float mapFactor = (remap01To255 != nullptr && remap01To255->boolValue()) ? 255 : 1;
+	var newVal;
+
+	if (val.isArray())
+	{
+		for (int i = 0; i < val.size(); i++)
+		{
+			//DBG("Value remap to " << i << " / " << (float)val[i]);
+			newVal.append(((float)val[i]) * mapFactor);
+		}
+	}
+	else
+	{
+		newVal = ((float)val) * mapFactor;
+	}
+
+	if (newVal.isArray())
+	{
+		//DBG("Val is array ");
+		//for(int i=0;i<newVal.size();i++) DBG("new val [" << i << "]/ " << (float)newVal[i]);
+	}
+	BaseCommand::setValue(newVal);
 }
 
 void DMXCommand::triggerInternal()
@@ -127,7 +144,7 @@ void DMXCommand::triggerInternal()
 		int numValues = dmxAction == SET_ALL ? 512 : channel2->intValue() - channel->intValue() + 1;
 		values.resize(numValues);
 		values.fill(value->intValue());
-		dmxModule->sendDMXValues(channel->intValue(), values);
+		dmxModule->sendDMXValues(0, values);
 	}
 	break;
 
@@ -177,24 +194,8 @@ void DMXCommand::loadJSONDataInternal(var data)
 	if(customValuesManager != nullptr) customValuesManager->loadJSONData(data.getProperty("customValues", var()), true);
 }
 
-void DMXCommand::useForMappingChanged(CustomValuesCommandArgument*)
-{
-	if (context != CommandContext::MAPPING) return;
-	if (customValuesManager == nullptr) return;
-
-	clearTargetMappingParameters();
-	int index = 0;
-	for (auto& item : customValuesManager->items)
-	{
-		if (item->useForMapping != nullptr && item->useForMapping->boolValue())
-		{
-			addTargetMappingParameterAt(item->param, index);
-			index++;
-		}
-	}
-}
-
 void DMXCommand::itemAdded(CustomValuesCommandArgument* a)
 {
+	BaseCommand::itemAdded(a);
 	a->param->setRange(0, 255);
 }

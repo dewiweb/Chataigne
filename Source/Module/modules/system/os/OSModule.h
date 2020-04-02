@@ -13,7 +13,8 @@
 #include "Module/Module.h"
 
 class OSModule :
-	public Module
+	public Module,
+	public Timer
 {
 public:
 	OSModule();
@@ -23,6 +24,17 @@ public:
 
 	EnumParameter * osType;
 	StringParameter * osName;
+	StringParameter* ips;
+
+	//Script
+	const Identifier launchAppId = "launchApp";
+
+	void updateIps();
+
+	bool launchFile(File f, String args = "");
+	static var launchFileFromScript(const var::NativeFunctionArgs& args);
+
+	void timerCallback() override;
 
 	virtual String getDefaultTypeString() const override { return "OS"; }
 	static OSModule * create() { return new OSModule(); }

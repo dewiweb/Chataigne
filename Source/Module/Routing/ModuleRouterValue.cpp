@@ -66,8 +66,17 @@ void ModuleRouterValue::setSourceAndOutModule(Module * s, Module * m)
 	{
 
 		routeParams.reset(outModule->createRouteParamsForSourceValue(s, sourceValue, valueIndex));
-		routeParams->loadJSONData(prevData);
-		addChildControllableContainer(routeParams.get());
+		if (routeParams != nullptr)
+		{
+			routeParams->loadJSONData(prevData);
+			addChildControllableContainer(routeParams.get());
+		}
+		else
+		{
+			NLOGERROR(niceName, "Error when trying to create routing values for out module : " << outModule->niceName);
+			return;
+		}
+			
 	}
 
 	valueListeners.call(&ValueListener::routeParamsChanged, this);
@@ -122,4 +131,12 @@ void ModuleRouterValue::onExternalTriggerTriggered(Trigger * t)
 	if (outModule == nullptr) return;
 	if (!enabled->boolValue() || forceDisabled) return;
 	if(t == sourceValue) outModule->handleRoutedModuleValue(sourceValue, routeParams.get());
+}
+
+void ModuleRouterValue::childStructureChanged(ControllableContainer* cc)
+{
+	if (cc == routeParams.get())
+	{
+		valueListeners.call(&ValueListener::routeParamsChanged, this);
+	}
 }

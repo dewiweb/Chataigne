@@ -8,6 +8,102 @@
 
 namespace BinaryData
 {
+    extern const char*   DLight_png;
+    const int            DLight_pngSize = 3180;
+
+    extern const char*   DMX_png;
+    const int            DMX_pngSize = 1298;
+
+    extern const char*   Gamepad_png;
+    const int            Gamepad_pngSize = 3840;
+
+    extern const char*   HeavyM_png;
+    const int            HeavyM_pngSize = 3533;
+
+    extern const char*   HTTP_png;
+    const int            HTTP_pngSize = 1102;
+
+    extern const char*   JoyCon_png;
+    const int            JoyCon_pngSize = 3212;
+
+    extern const char*   Joystick_png;
+    const int            Joystick_pngSize = 5538;
+
+    extern const char*   Keyboard_png;
+    const int            Keyboard_pngSize = 1860;
+
+    extern const char*   KinectV2_png;
+    const int            KinectV2_pngSize = 2254;
+
+    extern const char*   LiveOSC2_png;
+    const int            LiveOSC2_pngSize = 3172;
+
+    extern const char*   MadMapper_png;
+    const int            MadMapper_pngSize = 3783;
+
+    extern const char*   Metronome_png;
+    const int            Metronome_pngSize = 1314;
+
+    extern const char*   MIDI_png;
+    const int            MIDI_pngSize = 3792;
+
+    extern const char*   Millumin_png;
+    const int            Millumin_pngSize = 3457;
+
+    extern const char*   Mouse_png;
+    const int            Mouse_pngSize = 2911;
+
+    extern const char*   OS_png;
+    const int            OS_pngSize = 1669;
+
+    extern const char*   OSC_png;
+    const int            OSC_pngSize = 3566;
+
+    extern const char*   OSCQuery_png;
+    const int            OSCQuery_pngSize = 3840;
+
+    extern const char*   PJLink_png;
+    const int            PJLink_pngSize = 1008;
+
+    extern const char*   PowerPoint_png;
+    const int            PowerPoint_pngSize = 2548;
+
+    extern const char*   Reaper_png;
+    const int            Reaper_pngSize = 3655;
+
+    extern const char*   Resolume_png;
+    const int            Resolume_pngSize = 4182;
+
+    extern const char*   Serial_png;
+    const int            Serial_pngSize = 2298;
+
+    extern const char*   Signal_png;
+    const int            Signal_pngSize = 1749;
+
+    extern const char*   Sound_Card_png;
+    const int            Sound_Card_pngSize = 1266;
+
+    extern const char*   Stream_Deck_png;
+    const int            Stream_Deck_pngSize = 2693;
+
+    extern const char*   TCP_Client_png;
+    const int            TCP_Client_pngSize = 2909;
+
+    extern const char*   TCP_Server_png;
+    const int            TCP_Server_pngSize = 2909;
+
+    extern const char*   Time_png;
+    const int            Time_pngSize = 661;
+
+    extern const char*   UDP_png;
+    const int            UDP_pngSize = 2698;
+
+    extern const char*   Watchout_png;
+    const int            Watchout_pngSize = 2380;
+
+    extern const char*   Wiimote_png;
+    const int            Wiimote_pngSize = 2124;
+
     extern const char*   commandScriptTemplate_js;
     const int            commandScriptTemplate_jsSize = 444;
 
@@ -44,8 +140,11 @@ namespace BinaryData
     extern const char*   connected_png;
     const int            connected_pngSize = 3998;
 
+    extern const char*   crash_png;
+    const int            crash_pngSize = 64244;
+
     extern const char*   default_chalayout;
-    const int            default_chalayoutSize = 3341;
+    const int            default_chalayoutSize = 3506;
 
     extern const char*   disconnected_png;
     const int            disconnected_pngSize = 3820;
@@ -83,8 +182,11 @@ namespace BinaryData
     extern const char*   stripe_png;
     const int            stripe_pngSize = 2043;
 
+    extern const char*   tray_icon_png;
+    const int            tray_icon_pngSize = 3363;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 25;
+    const int namedResourceListSize = 59;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

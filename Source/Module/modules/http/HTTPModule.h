@@ -21,25 +21,37 @@ public:
 	~HTTPModule();
 
 	StringParameter * baseAddress;
+	BoolParameter* autoAdd;
+	Trigger* clearValues;
 
 	const Identifier sendGETId = "sendGET";
 	const Identifier sendPOSTId = "sendPOST";
+	const Identifier jsonDataTypeId = "json";
+	const Identifier rawDataTypeId = "raw";
 	const Identifier dataEventId = "dataEvent";
 
-	
 	enum RequestMethod { GET, POST };
-	void sendRequest(StringRef address, RequestMethod method, StringPairArray params = StringPairArray());
+	enum ResultDataType { RAW, JSON };
+
+
+	void sendRequest(StringRef address, RequestMethod method, ResultDataType dataType = ResultDataType::RAW, StringPairArray params = StringPairArray(), String extraHeaders = String());
 
 	struct Request
 	{
-		Request(URL u, RequestMethod m) : url(u), method(m) {}
+		Request(URL u, RequestMethod m, ResultDataType dataType = ResultDataType::RAW, String extraHeaders = String()) : url(u), method(m), resultDataType(dataType), extraHeaders(extraHeaders){}
+
 		URL url;
 		RequestMethod method;
+		ResultDataType resultDataType;
+		String extraHeaders;
 	};
 
 
 	OwnedArray<Request, CriticalSection> requests;
 	void processRequest(Request * request);
+
+	void createControllablesFromJSONResult(var data, ControllableContainer* container);
+	void onControllableFeedbackUpdateInternal(ControllableContainer*, Controllable* c) override;
 
 	//Script
 	void sendRequestFromScript(const var::NativeFunctionArgs& args, RequestMethod method);

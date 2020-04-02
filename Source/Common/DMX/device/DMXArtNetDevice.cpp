@@ -12,6 +12,13 @@
 
 #if JUCE_WINDOWS
 #include <iphlpapi.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include  <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #endif
 
 DMXArtNetDevice::DMXArtNetDevice() :
@@ -61,11 +68,12 @@ void DMXArtNetDevice::setupReceiver()
 
 	if (ioNode != nullptr) artnet_destroy(ioNode);
 
-	ioNode = artnet_new(networkInterface->getValue().toString().isNotEmpty()? networkInterface->getValue().toString().toRawUTF8():NULL, false);// , true); ;
+	String interfaceString = networkInterface->getValue().toString();
+	ioNode = artnet_new(interfaceString.isNotEmpty() ? interfaceString.toRawUTF8() : NULL,2);
 
 	if (ioNode == nullptr)
 	{
-		LOGWARNING("Setup Artnet Node failed, please try with another network interface");
+		LOGWARNING("Setup Artnet Node failed on " << interfaceString << " : " << artnet_strerror());
 		return;
 	}
 
@@ -254,6 +262,7 @@ Array<DMXArtNetDevice::NetworkInterface> DMXArtNetDevice::getAllInterfaces()
 		PIP_ADAPTER_ADDRESSES a = pAddresses;
 
 		while (a) {
+			if (a == nullptr || a->FirstUnicastAddress == nullptr) continue;
 			char * ipData = a->FirstUnicastAddress->Address.lpSockaddr->sa_data;
 			String ip = String((uint8)ipData[2]) + "." + String((uint8)ipData[3]) + "." + String((uint8)ipData[4]) + "." + String((uint8)ipData[5]);
 			result.add({ a->FriendlyName, ip });
@@ -266,6 +275,29 @@ Array<DMXArtNetDevice::NetworkInterface> DMXArtNetDevice::getAllInterfaces()
 	}
 
 	if (pAddresses)  free(pAddresses);
+#else
+    struct ifaddrs *interfaces = NULL;
+    if (getifaddrs(&interfaces) == 0) {
+        for (struct ifaddrs *ifa = interfaces; ifa; ifa = ifa->ifa_next) {
+            char buf[128];
+            if (ifa->ifa_addr->sa_family == AF_INET) {
+                inet_ntop(AF_INET, (void *)&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
+                          buf, sizeof(buf));
+            } else if (ifa->ifa_addr->sa_family == AF_INET6) {
+                continue;
+                //inet_ntop(AF_INET6, (void *)&((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr,
+                 //         buf, sizeof(buf));
+            } else {
+                continue;
+            }
+            
+            //char host[NI_MAXHOST];
+            //getnameinfo(ifa->ifa_addr, sizeof(ifa->ifa_addr), host, sizeof(host), NULL, 0, 0);
+            
+            result.add({String(ifa->ifa_name),String(buf)});
+        }
+    }
+    freeifaddrs(interfaces);
 #endif
 
 	return result;

@@ -1,37 +1,31 @@
 /*
   ==============================================================================
 
-    MappingFilterEditor.h
-    Created: 4 Feb 2017 8:31:15pm
-    Author:  Ben
+	MappingFilterEditor.h
+	Created: 4 Feb 2017 8:31:15pm
+	Author:  Ben
 
   ==============================================================================
 */
 
-#ifndef MAPPINGFILTEREDITOR_H_INCLUDED
-#define MAPPINGFILTEREDITOR_H_INCLUDED
-
+#pragma once
 
 #include "../MappingFilter.h"
 
 class MappingFilterEditor :
 	public BaseItemEditor,
-	public MappingFilter::AsyncListener
+	public MappingFilter::AsyncFilterListener
 {
 public:
-	MappingFilterEditor(MappingFilter * m, bool isRoot);
+	MappingFilterEditor(MappingFilter* m, bool isRoot);
 	~MappingFilterEditor();
 
-	MappingFilter * filter;
+	MappingFilter* filter;
 	std::unique_ptr<ParameterUI> filteredUI;
 
-	void resizedInternalHeaderItemInternal(Rectangle<int> &r) override;
+	void resizedInternalHeaderItemInternal(Rectangle<int>& r) override;
 
 	void updateFilteredUI();
-	virtual void filteredParamChangedAsync(MappingFilter *);
 
-protected:
-	void newMessage(const MappingFilter::FilterEvent &e) override;
+	virtual void newMessage(const MappingFilter::FilterEvent& e) override;
 };
-
-#endif  // MAPPINGFILTEREDITOR_H_INCLUDED

@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef OSCMODULE_H_INCLUDED
-#define OSCMODULE_H_INCLUDED
+#pragma once
 
 #include "Module/Module.h"
 #include "servus/servus.h"
@@ -23,6 +22,7 @@ public:
 	~OSCOutput();
 
 	bool forceDisabled;
+	bool senderIsConnected;
 	
 	//SEND
 	BoolParameter * useLocal;
@@ -43,7 +43,8 @@ public:
 class OSCModule :
 	public Module,
 	public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>,
-	public Thread //for zeroconf async creation (smoother when creating an OSC module)
+	public Thread, //for zeroconf async creation (smoother when creating an OSC module)
+	public BaseManager<OSCOutput>::ManagerListener
 { 
 public:
 	OSCModule(const String &name = "OSC", int defaultLocalPort = 12000, int defaultRemotePort = 9000, bool canHaveInput = true, bool canHaveOutput = true);
@@ -54,16 +55,17 @@ public:
 	IntParameter * localPort;
 	BoolParameter * isConnected;
 	OSCReceiver receiver;
-	
+	OSCSender genericSender;
+
 	//ZEROCONF
 	Servus servus;
 
 	std::unique_ptr<EnablingControllableContainer> receiveCC;
 	std::unique_ptr<BaseManager<OSCOutput>> outputManager;
+	std::unique_ptr<ControllableContainer> thruManager;
 
 	//Script
 	const Identifier oscEventId = "oscEvent";
-	const Identifier sendOSCId = "send";
 
 	//RECEIVE
 	virtual void setupReceiver();
@@ -77,15 +79,21 @@ public:
 
 	virtual void setupModuleFromJSONData(var data) override;
 
+	void itemAdded(OSCOutput* output) override;
+
 	//SEND
 	virtual void setupSenders();
-	void sendOSC(const OSCMessage &msg);
+	void sendOSC(const OSCMessage& msg, String ip = "", int port = 0);
 
 	//ZEROCONF
 	void setupZeroConf();
 
 	//Script
-	static var sendOSCFromScript(const var::NativeFunctionArgs &args);
+	static var sendOSCFromScript(const var::NativeFunctionArgs& args);
+	static var sendOSCToFromScript(const var::NativeFunctionArgs &args);
+
+	//Thru
+	static void createThruControllable(ControllableContainer* cc);
 
 
 	static OSCArgument varToArgument(const var &v);
@@ -122,6 +130,3 @@ public:
 
 	//InspectableEditor * getEditor(bool isRoot) override;	
 };
-
-
-#endif  // OSCMODULE_H_INCLUDED

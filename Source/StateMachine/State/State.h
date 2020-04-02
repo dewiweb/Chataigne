@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#ifndef STATE_H_INCLUDED
-#define STATE_H_INCLUDED
-
-
+#pragma once
 
 #include "Common/Processor/ProcessorManager.h"
 #include "../Transition/StateTransition.h"
@@ -26,6 +23,11 @@ public:
 	//
 	BoolParameter * active;
 
+	enum LoadBehavior { KEEP, ACTIVE, NONACTIVE };
+	EnumParameter * loadActivationBehavior;
+
+	BoolParameter* checkTransitionsOnActivate;
+
 	//Transition
 	Array<StateTransition *> inTransitions;
 	Array<StateTransition *> outTransitions;
@@ -38,7 +40,7 @@ public:
 	void loadJSONDataInternal(var data) override;
 
 	virtual bool paste() override;
-	virtual void selectAll() override;
+	virtual void selectAll(bool addToSelection = false) override;
 
 	virtual String getTypeString() const override { return "State"; }
 
@@ -46,7 +48,8 @@ public:
 	{
 	public:
 		virtual ~StateListener() {}
-		virtual void stateActivationChanged(State *) {}
+		virtual void stateActivationChanged(State*) {}
+		virtual void stateStartActivationChanged(State *) {}
 	};
 
 	ListenerList<StateListener> stateListeners;
@@ -61,7 +64,3 @@ private:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(State)
 };
-
-
-
-#endif  // STATE_H_INCLUDED

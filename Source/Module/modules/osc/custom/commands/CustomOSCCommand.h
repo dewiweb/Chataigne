@@ -8,19 +8,17 @@
   ==============================================================================
 */
 
-#ifndef CUSTOMOSCCOMMAND_H_INCLUDED
-#define CUSTOMOSCCOMMAND_H_INCLUDED
+#pragma once
 
 #include "../../commands/OSCCommand.h"
 #include "../CustomOSCModule.h"
 #include "Module/modules/common/commands/customvalues/CustomValuesCommandArgumentManager.h"
 
 class CustomOSCCommand :
-	public OSCCommand,
-	public CustomValuesCommandArgumentManager::ManagerListener
+	public OSCCommand
 {
 public:
-	CustomOSCCommand(CustomOSCModule * output, CommandContext context, var params);
+	CustomOSCCommand(OSCModule * output, CommandContext context, var params);
 	~CustomOSCCommand();
 	
 	var lastValue;
@@ -29,7 +27,6 @@ public:
 	Array<Parameter *> wildCardParams;
 
 	void triggerInternal() override;
-	void useForMappingChanged(CustomValuesCommandArgument * a) override;
 
 	virtual void onContainerParameterChanged(Parameter * p) override;
 
@@ -41,6 +38,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CustomOSCCommand)
 };
-
-
-#endif  // CUSTOMOSCCOMMAND_H_INCLUDED

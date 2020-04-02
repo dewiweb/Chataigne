@@ -12,6 +12,7 @@
 #include "commands/MIDICommands.h"
 #include "Common/MIDI/MIDIManager.h"
 #include "UI/ChataigneAssetManager.h"
+#include "Module/ModuleManager.h"
 
 MIDIModule::MIDIModule(const String & name, bool _useGenericControls) :
 	Module(name),
@@ -26,11 +27,15 @@ MIDIModule::MIDIModule(const String & name, bool _useGenericControls) :
 	if (useGenericControls)
 	{
 		autoAdd = moduleParams.addBoolParameter("Auto Add", "Auto Add MIDI values that are received but not in the list", true);
-		defManager.add(CommandDefinition::createDef(this, "", "Note On", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::NOTE_ON));
-		defManager.add(CommandDefinition::createDef(this, "", "Note Off", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::NOTE_OFF));
-		defManager.add(CommandDefinition::createDef(this, "", "Full Note", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::FULL_NOTE));
-		defManager.add(CommandDefinition::createDef(this, "", "Controller Change", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::CONTROLCHANGE));
-		defManager.add(CommandDefinition::createDef(this, "", "Sysex Message", &MIDISysExCommand::create));
+		defManager->add(CommandDefinition::createDef(this, "", "Note On", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::NOTE_ON));
+		defManager->add(CommandDefinition::createDef(this, "", "Note Off", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::NOTE_OFF));
+		defManager->add(CommandDefinition::createDef(this, "", "Full Note", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::FULL_NOTE));
+		defManager->add(CommandDefinition::createDef(this, "", "Controller Change", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::CONTROLCHANGE));
+		defManager->add(CommandDefinition::createDef(this, "", "Sysex Message", &MIDISysExCommand::create));
+		defManager->add(CommandDefinition::createDef(this, "", "Program Change", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::PROGRAMCHANGE));
+		defManager->add(CommandDefinition::createDef(this, "", "Pitch Wheel", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::PITCH_WHEEL));
+		defManager->add(CommandDefinition::createDef(this, "", "Channel Pressure", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::CHANNEL_PRESSURE));
+		defManager->add(CommandDefinition::createDef(this, "", "After Touch", &MIDINoteAndCCCommand::create)->addParam("type", (int)MIDINoteAndCCCommand::AFTER_TOUCH));
 	}
 	
 	autoFeedback = moduleParams.addBoolParameter("Auto Feedback", "If checked, all changed values will be resent automatically to the outputs", false);
@@ -49,6 +54,10 @@ MIDIModule::MIDIModule(const String & name, bool _useGenericControls) :
 	scriptObject.setMethod(sendNoteOffId, &MIDIModule::sendNoteOffFromScript);
 	scriptObject.setMethod(sendCCId, &MIDIModule::sendCCFromScript);
 	scriptObject.setMethod(sendSysexId, &MIDIModule::sendSysexFromScript);
+	scriptObject.setMethod(sendProgramChangeId, &MIDIModule::sendProgramChangeFromScript);
+	scriptObject.setMethod(sendPitchWheelId, &MIDIModule::sendPitchWheelFromScript);
+	scriptObject.setMethod(sendChannelPressureId, &MIDIModule::sendChannelPressureFromScript);
+	scriptObject.setMethod(sendAfterTouchId, &MIDIModule::sendAfterTouchFromScript);
 
 	scriptManager->scriptTemplate += ChataigneAssetManager::getInstance()->getScriptTemplate("midi");
 
@@ -57,6 +66,14 @@ MIDIModule::MIDIModule(const String & name, bool _useGenericControls) :
 	alwaysShowValues = true;
 
 	setupIOConfiguration(inputDevice != nullptr, outputDevice != nullptr);
+
+	if (hasInput)
+	{
+		thruManager.reset(new ControllableContainer("Pass-through"));
+		thruManager->userCanAddControllables = true;
+		thruManager->customUserCreateControllableFunc = &MIDIModule::createThruControllable;
+		moduleParams.addChildControllableContainer(thruManager.get());
+	}
 }
 
 MIDIModule::~MIDIModule()
@@ -70,7 +87,7 @@ void MIDIModule::sendNoteOn(int channel, int pitch, int velocity)
 {
 	if (!enabled->boolValue()) return;
 	if (outputDevice == nullptr) return;
-	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Note on " << MIDIManager::getNoteName(pitch) << ", " << velocity << ", " << channel);
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Note on, channel : " << channel << ", pitch : " << MIDIManager::getNoteName(pitch) << ", velociy " << velocity);
 	outActivityTrigger->trigger();
 	outputDevice->sendNoteOn(channel, pitch, velocity);
 }
@@ -79,7 +96,7 @@ void MIDIModule::sendNoteOff(int channel, int pitch)
 {
 	if (!enabled->boolValue()) return;
 	if (outputDevice == nullptr) return;
-	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Note off " << MIDIManager::getNoteName(pitch) << ", " << channel);
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Note off, channel : " << channel << ", pitch");
 	outActivityTrigger->trigger();
 	outputDevice->sendNoteOff(channel, pitch);
 }
@@ -88,18 +105,56 @@ void MIDIModule::sendControlChange(int channel, int number, int value)
 {
 	if (!enabled->boolValue()) return;
 	if (outputDevice == nullptr) return;
-	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Control Change " << number << ", " << value << ", " << channel);
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Control Change, channel : " << channel << ", number : " << number << ", value " << value);
 	outActivityTrigger->trigger();
 	outputDevice->sendControlChange(channel, number, value);
+}
+
+void MIDIModule::sendProgramChange(int channel, int program)
+{
+	if (!enabled->boolValue()) return;
+	if (outputDevice == nullptr) return;
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send ProgramChange, channel : " << channel << ", program : " << program);
+	outActivityTrigger->trigger();
+	outputDevice->sendProgramChange(channel, program);
 }
 
 void MIDIModule::sendSysex(Array<uint8> data)
 {
 	if (!enabled->boolValue()) return;
 	if (outputDevice == nullptr) return;
-	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Sysex " << data.size() << " bytes");
+	if (logOutgoingData->boolValue())
+	{
+		String s = "Send Sysex " + String(data.size()) + " bytes : ";
+		for (int i = 0; i < data.size(); i++) s += "\n" + String(data[i]);
+		NLOG(niceName, s);
+	}
 	outActivityTrigger->trigger();
 	outputDevice->sendSysEx(data);
+}
+
+void MIDIModule::sendPitchWheel(int channel, int value)
+{
+	if (!enabled->boolValue()) return;
+	if (outputDevice == nullptr) return;
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send PitchWheel channel : " << channel << ", value : " << value);
+	outputDevice->sendPitchWheel(channel, value);
+}
+
+void MIDIModule::sendChannelPressure(int channel, int value)
+{
+	if (!enabled->boolValue()) return;
+	if (outputDevice == nullptr) return;
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send Channel Pressure channel : " << channel << ", value : " << value);
+	outputDevice->sendChannelPressure(channel, value);
+}
+
+void MIDIModule::sendAfterTouch(int channel, int note, int value)
+{
+	if (!enabled->boolValue()) return;
+	if (outputDevice == nullptr) return;
+	if (logOutgoingData->boolValue()) NLOG(niceName, "Send After touch channel : " << channel << ", note : " << note << ", value : " << value);
+	outputDevice->sendAfterTouch(channel, note, value);
 }
 
 void MIDIModule::sendFullFrameTimecode(int hours, int minutes, int seconds, int frames, MidiMessage::SmpteTimecodeType timecodeType)
@@ -189,6 +244,7 @@ void MIDIModule::noteOnReceived(const int & channel, const int & pitch, const in
 {
 	if (!enabled->boolValue()) return; 
 	inActivityTrigger->trigger();
+	
 	if (logIncomingData->boolValue())  NLOG(niceName, "Note On : " << channel << ", " << MIDIManager::getNoteName(pitch) << ", " << velocity);
 
 	if (useGenericControls) updateValue(channel, MIDIManager::getNoteName(pitch), velocity, MIDIValueParameter::NOTE_ON, pitch);
@@ -248,16 +304,66 @@ void MIDIModule::fullFrameTimecodeReceived(const MidiMessage& msg)
 	NLOG(niceName, "Full frame timecode received : " << hours << ":" << minutes << ":" << seconds << "." << frames << " / " << timecodeType);
 }
 
+void MIDIModule::pitchWheelReceived(const int &channel, const int &value)
+{
+	if (!enabled->boolValue()) return;
+	inActivityTrigger->trigger();
+	if (logIncomingData->boolValue()) NLOG(niceName, "Pitch wheel, channel : " << channel << ", value : " << value);
+
+	if (useGenericControls) updateValue(channel, "PitchWheel", value, MIDIValueParameter::PITCH_WHEEL, 0);
+
+	if (scriptManager->items.size() > 0) scriptManager->callFunctionOnAllItems(pitchWheelEventId, Array<var>(channel, value));
+}
+
+void MIDIModule::channelPressureReceived(const int& channel, const int& value)
+{
+	if (!enabled->boolValue()) return;
+	inActivityTrigger->trigger();
+	if (logIncomingData->boolValue()) NLOG(niceName, "Channel Pressure, channel : " << channel << ", value : " << value);
+
+	if (useGenericControls) updateValue(channel, "ChannelPressure", value, MIDIValueParameter::CHANNEL_PRESSURE, 0);
+
+	if (scriptManager->items.size() > 0) scriptManager->callFunctionOnAllItems(channelPressureId, Array<var>(channel, value));
+}
+
+void MIDIModule::afterTouchReceived(const int& channel, const int& note, const int& value)
+{
+	if (!enabled->boolValue()) return;
+	inActivityTrigger->trigger();
+	if (logIncomingData->boolValue()) NLOG(niceName, "After Touch, channel : " << channel << ", note : " << note <<", value : " << value);
+
+	if (useGenericControls) updateValue(channel, "AfterTouch "+ MIDIManager::getNoteName(note), value, MIDIValueParameter::AFTER_TOUCH, note);
+
+	if (scriptManager->items.size() > 0) scriptManager->callFunctionOnAllItems(afterTouchId, Array<var>(channel, note, value));
+}
+
+void MIDIModule::midiMessageReceived(const MidiMessage& msg)
+{
+	if (thruManager != nullptr)
+	{
+		for (auto& c : thruManager->controllables)
+		{
+			if (TargetParameter* mt = (TargetParameter*)c)
+			{
+				if (!mt->enabled) continue;
+				if (MIDIModule * m = (MIDIModule*)(mt->targetContainer.get()))
+				{
+					if (m->midiParam->outputDevice != nullptr && m->midiParam->outputDevice->device != nullptr)
+					{
+						m->midiParam->outputDevice->device->sendMessageNow(msg);
+					}
+				}
+			}
+		}
+	}
+}
+
 var MIDIModule::sendNoteOnFromScript(const var::NativeFunctionArgs & args)
 {
 	MIDIModule * m = getObjectFromJS<MIDIModule>(args);
 	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 3)) return var();
 
-	if (args.numArguments < 3)
-	{
-		NLOG(m->niceName, "Not enough arguments passed from script, got " << args.numArguments << ", expected 3");
-		return var();
-	}
 
 	m->sendNoteOn(args.arguments[0], args.arguments[1], args.arguments[2]);
 	return var();
@@ -267,12 +373,8 @@ var MIDIModule::sendNoteOffFromScript(const var::NativeFunctionArgs & args)
 {
 	MIDIModule * m = getObjectFromJS<MIDIModule>(args);
 	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 2)) return var();
 
-	if (args.numArguments < 2)
-	{
-		NLOG(m->niceName, "Not enough arguments passed from script, got " << args.numArguments << ", expected 2");
-		return var();
-	}
 
 	m->sendNoteOff(args.arguments[0], args.arguments[1]);
 	return var();
@@ -282,12 +384,7 @@ var MIDIModule::sendCCFromScript(const var::NativeFunctionArgs & args)
 {
 	MIDIModule * m = getObjectFromJS<MIDIModule>(args);
 	if (!m->enabled->boolValue()) return var();
-
-	if (args.numArguments < 3)
-	{
-		NLOG(m->niceName, "Not enough arguments passed from script, got " << args.numArguments << ", expected 3");
-		return var();
-	}
+	if (!checkNumArgs(m->niceName, args, 3)) return var();
 
 	m->sendControlChange(args.arguments[0], args.arguments[1], args.arguments[2]);
 	return var();
@@ -297,17 +394,83 @@ var MIDIModule::sendSysexFromScript(const var::NativeFunctionArgs & args)
 {
 	MIDIModule * m = getObjectFromJS<MIDIModule>(args);
 	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 1)) return var();
 
-	if (args.numArguments == 0)
+	Array<const var *> allArgs;
+	for (int i = 0; i < args.numArguments; i++)
 	{
-		NLOG(m->niceName, "Not enough arguments passed from script, got " << args.numArguments << ", expected at least 1");
-		return var();
+		if (args.arguments[i].isArray())
+		{
+			for (int j = 0; j < args.arguments[i].size(); j++)
+			{
+				allArgs.add(&args.arguments[i][j]);
+			}
+		}
+		else
+		{
+			allArgs.add(&args.arguments[i]);
+		}
 	}
 
+	int numArgs = allArgs.size();
+
 	Array<uint8> data;
-	for (int i = 0; i < args.numArguments; i++) data.add((uint8)(int)args.arguments[i]);
+	for (int i = 0; i < numArgs; i++)
+	{
+		const var * a = allArgs[i];
+		if (a->isInt() || a->isInt64() || a->isDouble() || a->isBool())data.add((uint8)(int)*a);
+		else if (a->isString())
+		{
+			String s = a->toString();
+			for (int j = 0; j < s.length(); j++)
+			{
+				data.add((uint8)s[j]);
+			}
+		}
+	}
 	m->sendSysex(data);
 
+	return var();
+}
+
+var MIDIModule::sendProgramChangeFromScript(const var::NativeFunctionArgs& args)
+{
+	MIDIModule* m = getObjectFromJS<MIDIModule>(args);
+	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 2)) return var();
+
+
+	m->sendProgramChange(args.arguments[0], args.arguments[1]);
+	return var();
+}
+
+var MIDIModule::sendPitchWheelFromScript(const var::NativeFunctionArgs& args)
+{
+	MIDIModule* m = getObjectFromJS<MIDIModule>(args);
+	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 2)) return var();
+
+
+	m->sendPitchWheel(args.arguments[0], args.arguments[1]);
+	return var();
+}
+
+var MIDIModule::sendChannelPressureFromScript(const var::NativeFunctionArgs& args)
+{
+	MIDIModule* m = getObjectFromJS<MIDIModule>(args);
+	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 2)) return var();
+	m->sendChannelPressure(args.arguments[0], args.arguments[1]);
+	return var();
+}
+
+var MIDIModule::sendAfterTouchFromScript(const var::NativeFunctionArgs& args)
+{
+	MIDIModule* m = getObjectFromJS<MIDIModule>(args);
+	if (!m->enabled->boolValue()) return var();
+	if (!checkNumArgs(m->niceName, args, 3)) return var();
+
+	m->sendAfterTouch(args.arguments[0], args.arguments[1], args.arguments[2]);
 	return var();
 }
 
@@ -341,16 +504,21 @@ void MIDIModule::showMenuAndCreateValue(ControllableContainer * container)
 	PopupMenu m;
 	m.addItem(1, "Add Note");
 	m.addItem(2, "Add Control Change");
+	m.addItem(3, "Add Pitch Wheel");
 
 	int mResult = m.show();
 	if (mResult == 0) return;
 	
-	String mType = mResult == 1 ? "Note" : "Control Change";
-	String mName = mResult == 1 ? "Pitch" : "Number";
+	String mType = mResult == 1 ? "Note" : mResult == 3 ? "Pitch Wheel" : "Control Change";
 
 	AlertWindow window("Add a "+mType, "Configure the parameters for this "+mType, AlertWindow::AlertIconType::NoIcon);
 	window.addTextEditor("channel", "1", "Channel (1-16)");
-	window.addTextEditor("pitch", "1", mName + "(1-127)");
+
+	if (mResult != 3)
+	{
+		String mName = mResult == 1 ? "Pitch" : "Number";
+		window.addTextEditor("pitch", "1", mName + "(1-127)");
+	}
 
 	window.addButton("OK", 1, KeyPress(KeyPress::returnKey));
 	window.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey));
@@ -360,11 +528,29 @@ void MIDIModule::showMenuAndCreateValue(ControllableContainer * container)
 	if (result)
 	{
 		int channel = jlimit<int>(1, 16, window.getTextEditorContents("channel").getIntValue());
-		int pitch = jlimit<int>(1, 127, window.getTextEditorContents("pitch").getIntValue());
 
-		if (mResult == 1) module->noteOnReceived(channel, pitch, 0);
-		else module->controlChangeReceived(channel, pitch, 0);
+		if (mResult == 3)
+		{
+			module->pitchWheelReceived(channel, 0);
+		}
+		else
+		{
+			int pitch = jlimit<int>(1, 127, window.getTextEditorContents("pitch").getIntValue());
+			if (mResult == 1) module->noteOnReceived(channel, pitch, 0);
+			else module->controlChangeReceived(channel, pitch, 0);
+		}
 	}
+}
+
+void MIDIModule::createThruControllable(ControllableContainer* cc)
+{
+	TargetParameter* p = new TargetParameter("Output module", "Target module to send the raw data to", "");
+	p->targetType = TargetParameter::CONTAINER;
+	p->customGetTargetContainerFunc = &ModuleManager::showAndGetModuleOfType<MIDIModule>;
+	p->isRemovableByUser = true;
+	p->canBeDisabledByUser = true;
+	p->saveValueOnly = false;
+	cc->addParameter(p);
 }
 
 void MIDIModule::loadJSONDataInternal(var data)
@@ -372,6 +558,21 @@ void MIDIModule::loadJSONDataInternal(var data)
 	Module::loadJSONDataInternal(data);
 	valuesCC.orderControllablesAlphabetically();
 	setupIOConfiguration(inputDevice != nullptr || valuesCC.controllables.size() > 0, outputDevice != nullptr);
+
+	if (thruManager != nullptr)
+	{
+		//thruManager->loadJSONData(data.getProperty("thru", var()));
+		for (auto& c : thruManager->controllables)
+		{
+			if (TargetParameter* mt = dynamic_cast<TargetParameter*>(c))
+			{
+				mt->targetType = TargetParameter::CONTAINER;
+				mt->customGetTargetContainerFunc = &ModuleManager::showAndGetModuleOfType<MIDIModule>;
+				mt->isRemovableByUser = true;
+				mt->canBeDisabledByUser = true;
+			}
+		}
+	}
 }
 
 
@@ -387,40 +588,73 @@ MIDIModule::MIDIRouteParams::MIDIRouteParams(Module * sourceModule, Controllable
 	}
 
 	type = addEnumParameter("Type", "The type of MIDI Command to route");
-	type->addOption("Control Change", MIDIManager::CONTROL_CHANGE)->addOption("Note On", MIDIManager::NOTE_ON)->addOption("Note Off", MIDIManager::NOTE_OFF);
+	type->addOption("Control Change", MIDIManager::CONTROL_CHANGE)->addOption("Note On", MIDIManager::NOTE_ON)->addOption("Note Off", MIDIManager::NOTE_OFF)->addOption("Pitch Wheel", MIDIManager::PITCH_WHEEL);
 	type->setValueWithData(MIDIManager::getInstance()->midiRouterDefaultType->getValueData());
 
 	channel = addIntParameter("Channel", "The Channel", 1, 1, 16);
-	pitchOrNumber = addIntParameter("Pitch / Number", "Pitch if type is a note, number if it is a controlChange", 0, 0, 127);
+
+	if (type->getValueDataAsEnum<MIDIManager::MIDIEventType>() != MIDIManager::PITCH_WHEEL)
+	{
+		pitchOrNumber = addIntParameter("Pitch / Number", "Pitch if type is a note, number if it is a controlChange", 0, 0, 127);
+	}
+}
+
+void MIDIModule::MIDIRouteParams::onContainerParameterChanged(Parameter  * p)
+{
+	RouteParams::onContainerParameterChanged(p);
+
+	if (p == type)
+	{
+		if (type->getValueDataAsEnum<MIDIManager::MIDIEventType>() != MIDIManager::PITCH_WHEEL)
+		{
+			if(pitchOrNumber == nullptr) pitchOrNumber = addIntParameter("Pitch / Number", "Pitch if type is a note, number if it is a controlChange", 0, 0, 127);
+		}
+		else
+		{
+			if (pitchOrNumber != nullptr)
+			{
+				removeControllable(pitchOrNumber);
+				pitchOrNumber = nullptr;
+			}
+		}
+	}
 }
 
 
 void MIDIModule::handleRoutedModuleValue(Controllable * c, RouteParams * p)
 {
-	MIDIRouteParams * mp = dynamic_cast<MIDIRouteParams *>(p);
-	if (mp->type == nullptr) return;
+	if (c == nullptr || p == nullptr) return;
 
-	MIDIManager::MIDIEventType t = mp->type->getValueDataAsEnum<MIDIManager::MIDIEventType>();
-
-	int value = 127;
-	Parameter * sp = c->type == Controllable::TRIGGER ? nullptr : dynamic_cast<Parameter *>(c);
-	if (sp != nullptr) value = sp->getNormalizedValue() * 127;
-
-	switch (t)
+	if (MIDIRouteParams* mp = dynamic_cast<MIDIRouteParams*>(p))
 	{
-	case MIDIManager::NOTE_ON:
-		sendNoteOn(mp->channel->intValue(), mp->pitchOrNumber->intValue(), value);
-		break;
+		if (mp->type == nullptr) return;
 
-	case MIDIManager::NOTE_OFF:
-		sendNoteOff(mp->channel->intValue(), mp->pitchOrNumber->intValue());
-		break;
+		MIDIManager::MIDIEventType t = mp->type->getValueDataAsEnum<MIDIManager::MIDIEventType>();
 
-	case MIDIManager::CONTROL_CHANGE:
-		sendControlChange(mp->channel->intValue(), mp->pitchOrNumber->intValue(), value);
-		break;
+		int value = 127;
+		Parameter* sp = c->type == Controllable::TRIGGER ? nullptr : dynamic_cast<Parameter*>(c);
+		if (sp != nullptr) value = sp->getNormalizedValue() * 127;
 
-	default:
-		break;
+		switch (t)
+		{
+		case MIDIManager::NOTE_ON:
+			sendNoteOn(mp->channel->intValue(), mp->pitchOrNumber->intValue(), value);
+			break;
+
+		case MIDIManager::NOTE_OFF:
+			sendNoteOff(mp->channel->intValue(), mp->pitchOrNumber->intValue());
+			break;
+
+		case MIDIManager::CONTROL_CHANGE:
+			sendControlChange(mp->channel->intValue(), mp->pitchOrNumber->intValue(), value);
+			break;
+
+		case MIDIManager::PITCH_WHEEL:
+			sendPitchWheel(mp->channel->intValue(), value);
+			break;
+
+		default:
+			break;
+		}
 	}
 }

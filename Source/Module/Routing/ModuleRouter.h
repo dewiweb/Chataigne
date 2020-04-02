@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MODULEROUTER_H_INCLUDED
-#define MODULEROUTER_H_INCLUDED
-
+#pragma once
 
 #include "Module/Module.h"
 #include "ModuleRouterValue.h"
@@ -38,6 +36,9 @@ public:
 	void setSourceModule(Module * m);
 	void setDestModule(Module * m);
 
+	void reloadSourceValues(bool keepData = true);
+
+
 	var getJSONData() override;
 	void loadJSONDataInternal(var data) override;
 
@@ -63,5 +64,3 @@ public:
 	void addRouterListener(RouterListener* newListener) { routerListeners.add(newListener); }
 	void removeRouterListener(RouterListener* listener) { routerListeners.remove(listener); }
 };
-
-#endif  // MODULEROUTER_H_INCLUDED

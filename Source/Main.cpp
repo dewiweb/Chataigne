@@ -8,7 +8,7 @@
 //==============================================================================
 
 ChataigneApplication::ChataigneApplication() :
-	OrganicApplication("Chataigne")
+	OrganicApplication("Chataigne", true, ImageCache::getFromMemory(BinaryData::tray_icon_png, BinaryData::tray_icon_pngSize))
 {
 	enableSendAnalytics = appSettings.addBoolParameter("Send Analytics", "This helps me improve the software by sending basic start/stop/crash infos", true);
 }
@@ -16,16 +16,17 @@ ChataigneApplication::ChataigneApplication() :
 
 void ChataigneApplication::initialiseInternal(const String &)
 {
-	AppUpdater::getInstance()->setURLs(URL("http://benjamin.kuperberg.fr/chataigne/releases/update.json"), "http://benjamin.kuperberg.fr/chataigne/user/data/", "Chataigne");
-	HelpBox::getInstance()->helpURL = URL("http://benjamin.kuperberg.fr/chataigne/docs/help.json");
-	CrashDumpUploader::getInstance()->remoteURL = URL("http://benjamin.kuperberg.fr/chataigne/support/crash_report.php");
-
 	engine.reset(new ChataigneEngine());
 	mainComponent.reset(new MainContentComponent());
 
+	//Call after engine init
+	AppUpdater::getInstance()->setURLs(URL("http://benjamin.kuperberg.fr/chataigne/releases/update.json"), "http://benjamin.kuperberg.fr/chataigne/user/data/", "Chataigne");
+	HelpBox::getInstance()->helpURL = URL("http://benjamin.kuperberg.fr/chataigne/help/");
+	CrashDumpUploader::getInstance()->remoteURL = URL("http://benjamin.kuperberg.fr/chataigne/support/crash_report.php");
+	CrashDumpUploader::getInstance()->crashImage = ImageCache::getFromMemory(BinaryData::crash_png, BinaryData::crash_pngSize);
+
 	ShapeShifterManager::getInstance()->setDefaultFileData(BinaryData::default_chalayout);
 	ShapeShifterManager::getInstance()->setLayoutInformations("chalayout", "Chataigne/layouts");
-
 }
 
 
@@ -34,17 +35,17 @@ void ChataigneApplication::afterInit()
 	//ANALYTICS
 	if (enableSendAnalytics->boolValue())
 	{
-		DBG("Send analytics");
+		bool crashFound = CrashDumpUploader::getInstance()->crashFound;
 		
-		MatamoAnalytics::getInstance()->log(MatamoAnalytics::START);
+		StringPairArray options;
 		
-		Analytics::getInstance()->setUserId(SystemStats::getFullUserName());
+		if (crashFound) MatomoAnalytics::getInstance()->log(MatomoAnalytics::CRASH); 
+		else options.set("new_visit", "1");
 
-		// Add any analytics destinations we want to use to the Analytics singleton.
-		Analytics::getInstance()->addDestination(new GoogleAnalyticsDestination());
-		Analytics::getInstance()->logEvent("startup", {});
+		MatomoAnalytics::getInstance()->log(MatomoAnalytics::START, options);
 	}
 
+	//throw std::exception("This is a crash test"); //CRASH TEST
 }
 
 void ChataigneApplication::shutdown()
@@ -53,10 +54,9 @@ void ChataigneApplication::shutdown()
 
 	if (enableSendAnalytics->boolValue())
 	{
-		MatamoAnalytics::getInstance()->log(MatamoAnalytics::STOP);
-		Analytics::getInstance()->logEvent("shutdown", {});
+		MatomoAnalytics::getInstance()->log(MatomoAnalytics::STOP);
 	}
 
-	if(MatamoAnalytics::getInstanceWithoutCreating() != nullptr) MatamoAnalytics::deleteInstance();
+	if(MatomoAnalytics::getInstanceWithoutCreating() != nullptr) MatomoAnalytics::deleteInstance();
 	AppUpdater::deleteInstance();
 }

@@ -27,6 +27,9 @@ StateTransitionUI::StateTransitionUI(StateTransition * st, StateViewUI * _source
 	destSUI->addItemUIListener(this);
 	destSUI->addItemMinimalUIListener(this);
 	setRepaintsOnMouseActivity(true);
+
+	dragAndDropEnabled = false;
+
 	updateBounds();
 }
 
@@ -203,6 +206,11 @@ bool StateTransitionUI::hitTest(int x, int y)
 }
 
 void StateTransitionUI::itemUIMiniModeChanged(BaseItemUI<State> *)
+{
+	updateBounds();
+}
+
+void StateTransitionUI::itemUIViewPositionChanged(BaseItemMinimalUI<State>*)
 {
 	updateBounds();
 }

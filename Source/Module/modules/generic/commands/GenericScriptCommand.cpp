@@ -14,8 +14,10 @@
 String GenericScriptCommand::commandScriptTemplate = "";
 
 GenericScriptCommand::GenericScriptCommand(ChataigneGenericModule * _module, CommandContext context, var params) :
-	BaseCommand(_module, context, params)
+	BaseCommand(_module, context, params),
+	script(this, false)
 {
+
 	addChildControllableContainer(&script);
 
 	if(commandScriptTemplate.isEmpty()) commandScriptTemplate = ChataigneAssetManager::getInstance()->getScriptTemplateBundle(StringArray("generic", "command"));
@@ -26,9 +28,8 @@ GenericScriptCommand::~GenericScriptCommand()
 {
 }
 
-void GenericScriptCommand::setValue(var value)
+void GenericScriptCommand::setValueInternal(var value)
 {
-	BaseCommand::setValue(value);
 	Array<var> values;
 	values.add(value);
 	script.callFunction(setValueId, values);
@@ -36,7 +37,20 @@ void GenericScriptCommand::setValue(var value)
 
 void GenericScriptCommand::triggerInternal()
 {
-	script.callFunction(triggerId, Array<var>());
+	if(context != MAPPING) script.callFunction(triggerId, Array<var>());
+}
+
+var GenericScriptCommand::getJSONData()
+{
+	var data = BaseCommand::getJSONData();
+	data.getDynamicObject()->setProperty("script", script.getJSONData());
+	return data;
+}
+
+void GenericScriptCommand::loadJSONDataInternal(var data)
+{
+	BaseCommand::loadJSONDataInternal(data);
+	script.loadJSONData(data.getProperty("script", var()));
 }
 
 BaseCommand * GenericScriptCommand::create(ControllableContainer * module, CommandContext context, var params)

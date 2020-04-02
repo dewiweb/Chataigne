@@ -13,17 +13,19 @@
 
 CustomValuesCommandArgumentManager::CustomValuesCommandArgumentManager(bool _mappingEnabled, bool templateMode) :
 	BaseManager("arguments"),
-	mappingEnabled(_mappingEnabled),
-	templateMode(templateMode),
-	linkedTemplateManager(nullptr)
+	isBeingDestroyed(false),
+    mappingEnabled(_mappingEnabled),
+    templateMode(templateMode),
+    linkedTemplateManager(nullptr),
+	createParamCallbackFunc(nullptr)
 {
 	selectItemWhenCreated = false;
 	editorCanBeCollapsed = false;
-	
 }
 
 CustomValuesCommandArgumentManager::~CustomValuesCommandArgumentManager()
 {
+	isBeingDestroyed = true;
 	linkToTemplate(nullptr);
 }
 
@@ -44,20 +46,32 @@ void CustomValuesCommandArgumentManager::linkToTemplate(CustomValuesCommandArgum
 	if (linkedTemplateManager != nullptr)
 	{
 		linkedTemplateManager->addBaseManagerListener(this);
+		rebuildFromTemplate(true);
 	}
 
 	userCanAddItemsManually = linkedTemplateManager == nullptr;
-	rebuildFromTemplate();
 }
 
-void CustomValuesCommandArgumentManager::rebuildFromTemplate()
+void CustomValuesCommandArgumentManager::rebuildFromTemplate(bool clearItems)
 {
-	clear();
 	if (linkedTemplateManager == nullptr || linkedTemplateManagerRef.wasObjectDeleted()) return;
+	
+	if(clearItems) clear();
+	
 	for (auto & i : linkedTemplateManager->items)
 	{
-		CustomValuesCommandArgument * a = addItemFromData(i->getJSONData());
-		 a->linkToTemplate(i);
+		CustomValuesCommandArgument* a = nullptr;
+		if (clearItems) a = addItemFromData(i->getJSONData());
+		else a = items[linkedTemplateManager->items.indexOf(i)];
+
+		jassert(a != nullptr);
+
+		if (a != nullptr)
+		{
+			a->linkToTemplate(i);
+			a->userCanRemove = false;
+			a->userCanDuplicate = false;
+		}
 	}
 
 	hideInEditor = items.size() == 0;
@@ -74,8 +88,19 @@ CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemWithPar
 
 CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemFromType(Parameter::Type type, var data, bool fromUndoableAction)
 {
-	Parameter * p = nullptr;
-	String id = String(items.size() + 1);
+	Parameter* p = createParameterFromType(type, data, items.size());
+	if (p == nullptr) return nullptr;
+
+	return addItemWithParam(p, data, fromUndoableAction);
+}
+
+Parameter * CustomValuesCommandArgumentManager::createParameterFromType(Parameter::Type type, var data, int index)
+{
+	if (!linkedTemplateManagerRef.wasObjectDeleted() && linkedTemplateManager != nullptr) return linkedTemplateManager->createParameterFromType(type, data, index);
+
+	String id = String(index + 1);
+
+	Parameter* p = nullptr;
 
 	switch (type)
 	{
@@ -83,7 +108,7 @@ CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemFromTyp
 		p = new StringParameter("#" + id, "Argument #" + id + ", type int", "example");
 		break;
 	case Parameter::FLOAT:
-		p = new FloatParameter("#" + id, "Argument #" + id + ", type foat", 0);
+		p = new FloatParameter("#" + id, "Argument #" + id + ", type float", 0);
 		break;
 	case Parameter::INT:
 		p = new IntParameter("#" + id, "Argument #" + id + ", type int", 0);
@@ -101,19 +126,25 @@ CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemFromTyp
 		p = new Point3DParameter("#" + id, "Argument #" + id + ", type 3D");
 		break;
 
-        default:
-            break;
+	default:
+		break;
 	}
 
-	if (p == nullptr) return nullptr;
-	return addItemWithParam(p, data, fromUndoableAction);
+	if(p != nullptr) p->isCustomizableByUser = true;
+
+	if(createParamCallbackFunc != nullptr) createParamCallbackFunc(p, data);
+	
+	return p;
 }
 
-CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemFromData(var data, bool fromUndoableAction)
+CustomValuesCommandArgument* CustomValuesCommandArgumentManager::addItemFromData(var data, bool fromUndoableAction)
 {
-	String s = data.getProperty("type", "");
-	if (s.isEmpty()) return nullptr;
-	Parameter * p = (Parameter *)ControllableFactory::createControllable(s);
+	Controllable::Type t = (Controllable::Type)Controllable::typeNames.indexOf(data.getProperty("type", ""));
+	return addItemFromType(t, data, fromUndoableAction);
+	
+	/*if (s.isEmpty()) return nullptr;
+
+	Parameter * p =  (Parameter *)ControllableFactory::createControllable(s);
 	if (p == nullptr)
 	{
 		LOG("Error loading custom argument !");
@@ -121,6 +152,7 @@ CustomValuesCommandArgument * CustomValuesCommandArgumentManager::addItemFromDat
 	}
 
  	return addItemWithParam(p, data, fromUndoableAction);
+	*/
 }
 
 void CustomValuesCommandArgumentManager::autoRenameItems()
@@ -139,13 +171,9 @@ void CustomValuesCommandArgumentManager::removeItemInternal(CustomValuesCommandA
 
 void CustomValuesCommandArgumentManager::useForMappingChanged(CustomValuesCommandArgument * i)
 {
-	argumentManagerListeners.call(&ManagerListener::useForMappingChanged, i);
+	argumentManagerListeners.call(&ArgumentManagerListener::useForMappingChanged, i);
 }
 
-void CustomValuesCommandArgumentManager::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
-{
-
-}
 
 void CustomValuesCommandArgumentManager::itemAdded(CustomValuesCommandArgument * i)
 {
@@ -164,7 +192,22 @@ void CustomValuesCommandArgumentManager::itemRemoved(CustomValuesCommandArgument
 			break;
 		}
 	}
-	if (itemToRemove != nullptr) removeItem(itemToRemove, false);
+	if (itemToRemove != nullptr)
+	{
+		if (linkedTemplateManager != nullptr && linkedTemplateManager->isBeingDestroyed) itemToRemove->linkToTemplate(nullptr); //do not sync on template destroy so we can keep ghost data
+		else removeItem(itemToRemove, false);
+	}
+}
+
+void CustomValuesCommandArgumentManager::itemsReordered()
+{
+	useForMappingChanged();
+}
+
+void CustomValuesCommandArgumentManager::loadJSONDataInternal(var data)
+{
+	if(linkedTemplateManager == nullptr || !data.isVoid()) BaseManager::loadJSONDataInternal(data);
+	rebuildFromTemplate(false); //cannot do without clearing, already cleared by parent method
 }
 
 InspectableEditor * CustomValuesCommandArgumentManager::getEditor(bool isRoot)

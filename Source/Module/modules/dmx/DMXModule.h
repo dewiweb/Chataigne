@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef DMXMODULE_H_INCLUDED
-#define DMXMODULE_H_INCLUDED
+#pragma once
 
 #include "Module/Module.h"
 #include "Common/DMX/device/DMXDevice.h"
@@ -31,6 +30,10 @@ public:
 
 	HashMap<int, IntParameter *> channelMap;
 
+	//Script
+	const Identifier dmxEventId = "dmxEvent";
+	const Identifier sendDMXId = "send";
+
 	void setCurrentDMXDevice(DMXDevice * d);
 
 	void sendDMXValue(int channel, int value);
@@ -38,6 +41,9 @@ public:
 	void send16BitDMXValue(int startChannel, int value, DMXByteOrder byteOrder);
 	void send16BitDMXValues(int startChannel, Array<int> values, DMXByteOrder byteOrder);
 
+
+	//Script
+	static var sendDMXFromScript(const var::NativeFunctionArgs& args);
 
 	virtual void clearItem() override;
 
@@ -64,7 +70,6 @@ public:
 		EnumParameter * mode16bit;
 		BoolParameter * fullRange;
 		IntParameter * channel;
-		IntParameter * value;
 
 	};
 
@@ -87,6 +92,3 @@ public:
 	void addDMXModuleListener(DMXModuleListener* newListener) { dmxModuleListeners.add(newListener); }
 	void removeDMXModuleListener(DMXModuleListener* listener) { dmxModuleListeners.remove(listener); }
 };
-
-
-#endif  // DMXMODULE_H_INCLUDED

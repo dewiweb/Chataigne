@@ -8,19 +8,19 @@
   ==============================================================================
 */
 
-#ifndef BASECOMMANDHANDLER_H_INCLUDED
-#define BASECOMMANDHANDLER_H_INCLUDED
+#pragma once
 
 #include "CommandDefinition.h"
 #include "BaseCommand.h"
+#include "Common/Command/Template/CommandTemplateManager.h"
 #include "Module/ModuleManager.h"
 
 class BaseCommandHandler :
 	public BaseItem,
 	public Inspectable::InspectableListener,
 	public BaseCommand::CommandListener,
-	public ModuleManager::Listener,
-	public CommandTemplateManager::Listener
+	public ModuleManager::ManagerListener,
+	public CommandTemplateManager::ManagerListener
 {
 public:
 	BaseCommandHandler(const String &name = "BaseCommandHandler", CommandContext context = CommandContext::ACTION, Module * lockedModule = nullptr);
@@ -89,6 +89,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BaseCommandHandler)
 };
-
-
-#endif  // BASECOMMANDHANDLER_H_INCLUDED

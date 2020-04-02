@@ -11,6 +11,7 @@
 #include "Action.h"
 #include "ui/ActionUI.h"
 #include "Condition/conditions/ActivationCondition/ActivationCondition.h"
+#include "Condition/conditions/StandardCondition/StandardCondition.h"
 
 Action::Action(const String & name, var params) :
 	Processor(params.getProperty("name", name)),
@@ -67,14 +68,6 @@ void Action::updateConditionRoles()
 }
 
 
-void Action::setForceDisabled(bool value, bool force)
-{
-	Processor::setForceDisabled(value, force);
-	cdm.setForceDisabled(value);
-	csmOn->setForceDisabled(value);
-	if(hasOffConsequences) csmOff->setForceDisabled(value);
-}
-
 void Action::setHasOffConsequences(bool value)
 {
 	if (Engine::mainEngine->isClearing) return;
@@ -105,6 +98,14 @@ void Action::setHasOffConsequences(bool value)
 	}
 }
 
+void Action::updateDisables(bool force)
+{
+	Processor::updateDisables();
+	cdm.setForceDisabled(forceDisabled || !enabled->boolValue(), force);
+	csmOn->setForceDisabled(forceDisabled || !enabled->boolValue(), force);
+	if (hasOffConsequences) csmOff->setForceDisabled(forceDisabled || !enabled->boolValue(), force);
+}
+
 var Action::getJSONData()
 {
 	var data = Processor::getJSONData();
@@ -114,16 +115,24 @@ var Action::getJSONData()
 	return data;
 }
 
-void Action::loadJSONDataInternal(var data)
+void Action::loadJSONDataItemInternal(var data)
 {
-	Processor::loadJSONDataInternal(data);
+	Processor::loadJSONDataItemInternal(data);
 
 	cdm.loadJSONData(data.getProperty("conditions", var()));
 	csmOn->loadJSONData(data.getProperty("consequences", var()));
 
 	updateConditionRoles();
-	if(hasOffConsequences) csmOff->loadJSONData(data.getProperty("consequencesOff", var()));
 
+	if (enabled->boolValue() && !forceDisabled && actionRoles.contains(Role::ACTIVATE) && Engine::mainEngine->isLoadingFile) Engine::mainEngine->addEngineListener(this);
+
+	if(hasOffConsequences) csmOff->loadJSONData(data.getProperty("consequencesOff", var()));
+}
+
+void Action::endLoadFile()
+{
+	Engine::mainEngine->removeEngineListener(this);
+	if (actionRoles.contains(Role::ACTIVATE) && cdm.getIsValid(false)) triggerOn->trigger();
 }
 
 void Action::onContainerParameterChangedInternal(Parameter * p)
@@ -181,9 +190,12 @@ void Action::conditionManagerValidationChanged(ConditionManager *)
 }
 
 
-void Action::itemAdded(Condition *)
+void Action::itemAdded(Condition * c)
 {
 	updateConditionRoles();
+
+	StandardCondition* sc = dynamic_cast<StandardCondition*>(c);
+	if (sc != nullptr) sc->sourceTarget->warningResolveInspectable = this;
 }
 
 void Action::itemRemoved(Condition *)

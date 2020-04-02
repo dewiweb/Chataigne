@@ -13,12 +13,24 @@
 
 CVPresetEditor::CVPresetEditor(CVPreset * preset, bool isRoot) :
     BaseItemEditor(preset, isRoot),
-    weightUI(nullptr),
 	preset(preset)
 {
 	weightUI.reset(preset->weight->createSlider());
+	colorUI.reset(preset->targetColor->createColorParamUI());
+	attractionUI.reset(preset->attraction->createSlider());
+
 	addChildComponent(weightUI.get());
-	weightUI->setVisible(preset->group->controlMode->getValueDataAsEnum<CVGroup::ControlMode>() != CVGroup::FREE);
+	addChildComponent(colorUI.get());
+	addChildComponent(attractionUI.get());
+
+	CVGroup::ControlMode cm = preset->group->controlMode->getValueDataAsEnum<CVGroup::ControlMode>();
+	bool useMorpher = cm == CVGroup::VORONOI || cm == CVGroup::GRADIENT_BAND;
+	bool useWeights = useMorpher || cm == CVGroup::WEIGHTS;
+
+	weightUI->setVisible(useWeights);
+	colorUI->setVisible(useMorpher);
+	attractionUI->setVisible(useMorpher);
+	
 	preset->group->controlMode->addAsyncParameterListener(this);
 }
 
@@ -29,14 +41,22 @@ CVPresetEditor::~CVPresetEditor()
 
 void CVPresetEditor::resizedInternalHeaderItemInternal(Rectangle<int>& r)
 {
-	if(weightUI->isVisible()) weightUI->setBounds(r.removeFromRight(jmin(r.getWidth() - 100, 100)).reduced(3));
+	if (colorUI->isVisible()) colorUI->setBounds(r.removeFromLeft(r.getHeight()).reduced(2));
+	if (weightUI->isVisible()) weightUI->setBounds(r.removeFromRight(jmin(r.getWidth() - 100, 100)).reduced(3));
+	if(attractionUI->isVisible()) attractionUI->setBounds(r.removeFromRight(jmin(r.getWidth() - 100, 100)).reduced(3));
 }
 
 void CVPresetEditor::newMessage(const Parameter::ParameterEvent & e)
 {
 	if (e.parameter == preset->group->controlMode)
 	{
-		weightUI->setVisible(preset->group->controlMode->getValueDataAsEnum<CVGroup::ControlMode>() != CVGroup::FREE);
+		CVGroup::ControlMode cm = preset->group->controlMode->getValueDataAsEnum<CVGroup::ControlMode>();
+		bool useMorpher = cm == CVGroup::VORONOI || cm == CVGroup::GRADIENT_BAND;
+		bool useWeights = useMorpher || cm == CVGroup::WEIGHTS;
+		
+		weightUI->setVisible(useWeights);
+		colorUI->setVisible(useMorpher);
+		attractionUI->setVisible(useMorpher);
 		resized();
 	}
 }

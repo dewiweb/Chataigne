@@ -25,6 +25,7 @@ public:
 	std::unique_ptr<EnablingControllableContainer> receiveCC;
 	IntParameter * localPort;
 	BoolParameter * receiverIsBound;
+	IntParameter* receiveFrequency;
 
 	//SEND
 	std::unique_ptr<EnablingControllableContainer> sendCC;
@@ -42,7 +43,10 @@ public:
 	virtual void clearThread();
 	virtual void clearInternal() {}
 
+	virtual void onContainerParameterChangedInternal(Parameter* p) override;
 	virtual void controllableFeedbackUpdate(ControllableContainer *, Controllable * c) override;
+
+	virtual void loadJSONDataInternal(var data) override;
 
 	virtual void initThread() {}
 	virtual void run() override;

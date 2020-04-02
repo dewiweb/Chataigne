@@ -34,14 +34,22 @@ void Guider::setCurrentGuide(BaseGuide * g)
 		guide->clear();
 		guide->removeGuideListener(this);
 		getApp().mainComponent->removeChildComponent(guide.get());
+		getApp().mainComponent->removeComponentListener(this);
 	}
 
 	guide.reset(g);
 
 	if (guide != nullptr)
 	{
+		FileBasedDocument::SaveResult result = Engine::mainEngine->saveIfNeededAndUserAgrees();
+		if (result == FileBasedDocument::SaveResult::failedToWriteToFile) LOGERROR("Could not save the document (Failed to write to file)\nCancelled loading of the new document");
+		else Engine::mainEngine->createNewGraph();
+
+		ShapeShifterManager::getInstance()->loadDefaultLayoutFile();
+
 		guide->addGuideListener(this);
 		getApp().mainComponent->addAndMakeVisible(guide.get());
+		getApp().mainComponent->addComponentListener(this);
 		guide->setBounds(getApp().mainComponent->getLocalBounds());
 		guide->toFront(true);
 		guide->init();
@@ -67,4 +75,10 @@ String Guider:: getGuideName(int guideIndex)
 void Guider::guideFinished()
 {
 	setCurrentGuide(nullptr);
+}
+
+void Guider::componentMovedOrResized(Component& component, bool wasMoved, bool wasResized)
+{
+	if (guide != nullptr && wasResized)
+		guide->setBounds(getApp().mainComponent->getLocalBounds());
 }

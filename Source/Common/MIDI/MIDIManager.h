@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MIDIMANAGER_H_INCLUDED
-#define MIDIMANAGER_H_INCLUDED
+#pragma once
 
 #include "MIDIDevice.h"
 
@@ -34,7 +33,7 @@ public:
 	MIDIOutputDevice * getOutputDeviceWithName(const String &name);
 	
 	//Gloabal Settings
-	enum MIDIEventType { NOTE_ON, NOTE_OFF, FULL_NOTE, CONTROL_CHANGE, SYSEX};
+	enum MIDIEventType { NOTE_ON, NOTE_OFF, FULL_NOTE, CONTROL_CHANGE, PITCH_WHEEL, SYSEX};
 	EnumParameter * midiRouterDefaultType;
 
 	class  Listener
@@ -42,11 +41,11 @@ public:
 	public:
 		/** Destructor. */
 		virtual ~Listener() {}
-		virtual void midiDeviceInAdded(MIDIInputDevice * /*input*/) = 0;
-		virtual void midiDeviceOutAdded(MIDIOutputDevice * /*output*/) = 0;
+		virtual void midiDeviceInAdded(MIDIInputDevice* /*input*/) {}
+		virtual void midiDeviceOutAdded(MIDIOutputDevice* /*output*/) {}
 
-		virtual void midiDeviceInRemoved(MIDIInputDevice * /*input*/) = 0;
-		virtual void midiDeviceOutRemoved(MIDIOutputDevice * /*output*/) = 0;
+		virtual void midiDeviceInRemoved(MIDIInputDevice* /*input*/) {}
+		virtual void midiDeviceOutRemoved(MIDIOutputDevice* /*output*/) {}
 	};
 
 	ListenerList<Listener> listeners;
@@ -65,6 +64,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE(MIDIManager)
 };
-
-
-#endif  // MIDIMANAGER_H_INCLUDED

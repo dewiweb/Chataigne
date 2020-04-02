@@ -11,7 +11,6 @@
 #pragma once
 #include "Module/Module.h"
 
-#if JUCE_WINDOWS
 #include "Common/InputSystem/InputSystemManager.h"
 
 class JoystickModule :
@@ -22,7 +21,11 @@ public:
 	JoystickModule(const String &name = "Joystick");
 	~JoystickModule();
 
-	JoystickParameter * joystickParam;
+	JoystickParameter* joystickParam;
+
+	ControllableContainer calibCC;
+	Array<FloatParameter *> axisOffset;
+	Array<FloatParameter *> axisDeadzone;
 
 	void rebuildValues();
 
@@ -37,5 +40,3 @@ public:
 
 
 };
-
-#endif

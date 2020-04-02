@@ -11,7 +11,6 @@
 #pragma once
 #include "JuceHeader.h"
 
-#if JUCE_WINDOWS
 #include "SDL.h"
 
 
@@ -19,15 +18,17 @@ class Joystick
 {
 public:
 	Joystick(SDL_Joystick * joystick);
-	~Joystick();
+	virtual ~Joystick();
 
 	SDL_Joystick * joystick;
 
 	ControllableContainer axesCC;
 	ControllableContainer buttonsCC;
 
-	virtual void update();
+	float axisOffset[SDL_JOYSTICK_AXIS_MAX];
+	float axisDeadZone[SDL_JOYSTICK_AXIS_MAX];
 
+	virtual void update();
 
 	WeakReference<Joystick>::Master masterReference;
 };
@@ -36,12 +37,16 @@ class Gamepad
 {
 public:
 	Gamepad(SDL_GameController * gamepad);
-	~Gamepad();
+	virtual ~Gamepad();
 
 	SDL_GameController * gamepad;
 
 	ControllableContainer axesCC;
 	ControllableContainer buttonsCC;
+
+
+	float axisOffset[SDL_JOYSTICK_AXIS_MAX];
+	float axisDeadZone[SDL_JOYSTICK_AXIS_MAX];
 
 	virtual void update();
 
@@ -167,6 +172,3 @@ public:
 	void addAsyncCoalescedInputListener(AsyncListener* newListener) { inputQueuedNotifier.addAsyncCoalescedListener(newListener); }
 	void removeAsyncInputListener(AsyncListener* listener) { inputQueuedNotifier.removeListener(listener); }
 };
-
-
-#endif

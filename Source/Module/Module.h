@@ -8,15 +8,17 @@
   ==============================================================================
 */
 
-#ifndef MODULE_H_INCLUDED
-#define MODULE_H_INCLUDED
+#pragma once
 
 #include "JuceHeader.h"
-#include "Common/Command/Template/CommandTemplateManager.h"
+#include "Common/Command/CommandContext.h"
+#include  "Common/Command/CommandDefinitionManager.h"
 
 class ModuleCommandTester;
 class BaseCommandHandler;
 class CommandDefinition;
+class CommandTemplateManager;
+class ModuleUI;
 
 class Module :
 	public BaseItem
@@ -33,12 +35,13 @@ public:
 	BoolParameter * logIncomingData;
 	BoolParameter * logOutgoingData;
 
-	Trigger * inActivityTrigger;
-	Trigger * outActivityTrigger;
+	//Do not include in hierarchy to avoid going crazy on those listeners
+	std::unique_ptr<Trigger> inActivityTrigger;
+	std::unique_ptr<Trigger> outActivityTrigger;
 
 	BoolParameter * connectionFeedbackRef;
 
-	CommandDefinitionManager defManager;
+	std::unique_ptr<CommandDefinitionManager> defManager;
 	ControllableContainer valuesCC;
 
 	bool alwaysShowValues;
@@ -46,11 +49,15 @@ public:
 	bool includeValuesInSave;
 
 	std::unique_ptr<ModuleCommandTester> commandTester;
+	std::unique_ptr<CommandDefinition> scriptCommanDef;
 
 	String customType; //for custom modules;
+	var customModuleData; //for allowing loading data from custom module definition after file load
 
 	//Template
-	CommandTemplateManager templateManager;
+	std::unique_ptr<CommandTemplateManager> templateManager;
+
+	virtual void clearItem() override;
 
 	virtual void setupIOConfiguration(bool _hasInput, bool _hasOutput);
 
@@ -109,9 +116,12 @@ public:
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c) override;
 	
 	var getJSONData() override;
-	void loadJSONDataInternal(var data) override;
+	void loadJSONDataItemInternal(var data) override;
+	void loadJSONDataInternal(var data) override; // needed for script loading after item load
 
 	virtual void setupModuleFromJSONData(var data); //Used for custom modules with a module.json definition, to automatically create parameters, command and values from this file.
+	virtual void setupScriptsFromJSONData(var data); //Used for custom modules, setup scripts in this function (either on creation or after load)
+
 	void loadDefaultsParameterValuesForContainer(var data, ControllableContainer * cc);
 	void createControllablesForContainer(var data, ControllableContainer * cc);
 
@@ -123,7 +133,7 @@ public:
 	virtual String getDefaultTypeString() const { jassert(false); return ""; }
 
 	virtual InspectableEditor * getEditor(bool isRoot) override;
-
+	virtual ModuleUI* getModuleUI();
 
 	class ModuleListener
 	{
@@ -140,8 +150,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Module)
 };
-
-
-
-
-#endif  // MODULE_H_INCLUDED

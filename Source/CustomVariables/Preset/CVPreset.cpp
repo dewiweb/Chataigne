@@ -13,26 +13,24 @@
 #include "ui/CVPresetEditor.h"
 
 CVPreset::CVPreset(CVGroup * group) :
-	BaseItem("Preset"),
+	MorphTarget("Preset"),
 	group(group),
 	values("Values",&group->values,false)
 {
 	jassert(group != nullptr);
+
+
 	values.hideEditorHeader = true;
 	values.editorCanBeCollapsed = false;
 
-	isSelectable = false;
 	showInspectorOnSelect = false;
 
-	addChildControllableContainer(&values);
+	CVGroup::ControlMode cm = group->controlMode->getValueDataAsEnum<CVGroup::ControlMode>();
 
-	weight = addFloatParameter("Weight", "Weight of this preset in a non-free control mode", 0, 0, 1);
-	weight->hideInEditor = true;
-	pos = addPoint2DParameter("Position", "Position in a 2D interpolation control mode, such as Voronoi or Gradient Band");
-	pos->hideInEditor = true;
-	color = new ColorParameter("Color", "The color of the handle in a 2D interpolation editor");
-	addParameter(color);
-	color->hideInEditor = true;
+	weight->setControllableFeedbackOnly(cm == CVGroup::FREE || cm == CVGroup::WEIGHTS);
+
+	addChildControllableContainer(&values);
+	
 }
 
 CVPreset::~CVPreset()
@@ -41,21 +39,49 @@ CVPreset::~CVPreset()
 
 var CVPreset::getJSONData()
 {
-	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("values", values.getJSONData());
+	var data = MorphTarget::getJSONData();
+	data.getDynamicObject()->setProperty(values.shortName, values.getJSONData());
 	return data;
 }
 
 void CVPreset::loadJSONDataInternal(var data)
 {
-	BaseItem::loadJSONDataInternal(data);
-	values.loadJSONData(data.getProperty("values", var()),true);
+	MorphTarget::loadJSONDataInternal(data);
+	values.loadJSONData(data.getProperty(values.shortName, var()),true);
+}
+
+var CVPreset::getValuesAsJSON()
+{
+	var data = new DynamicObject();
+	Array<WeakReference<Parameter>> params = values.getAllParameters();
+	for (auto& p : params) data.getDynamicObject()->setProperty(p->shortName, p->value);
+
+	return data;
+}
+
+void CVPreset::loadValuesFromJSON(var data)
+{
+	if (!data.isObject())
+	{
+		NLOGWARNING(niceName, "Can't load preset values, data is not a json object");
+		return;
+	}
+
+	NamedValueSet props = data.getDynamicObject()->getProperties();
+	for (auto& nv : props)
+	{
+		Parameter* p = values.getParameterByName(nv.name.toString());
+		if (p != nullptr) p->setValue(nv.value);
+	}
 }
 
 InspectableEditor * CVPreset::getEditor(bool isRoot)
 {
 	return new CVPresetEditor(this, isRoot);
 }
+
+
+
 
 GenericControllableManagerLinkedContainer::GenericControllableManagerLinkedContainer(const String &name, GenericControllableManager * manager, bool keepValuesInSync) :
 	ControllableContainer(name),
@@ -105,6 +131,7 @@ void GenericControllableManagerLinkedContainer::addValueFromItem(Parameter * sou
 	linkMap.set(p, source);
 	source->addControllableListener(this);
 	source->addParameterListener(this);
+	p->forceSaveValue = true;
 	syncItem(p, source);
 	addParameter(p);
 }

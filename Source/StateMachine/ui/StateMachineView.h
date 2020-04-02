@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef STATEMACHINEVIEW_H_INCLUDED
-#define STATEMACHINEVIEW_H_INCLUDED
+#pragma once
 
 #pragma warning(disable:4244 4100 4305)
 
@@ -40,12 +39,14 @@ public:
 	void mouseDown(const MouseEvent &e) override;
 	void mouseDoubleClick(const MouseEvent &e) override;
 	bool keyPressed(const KeyPress &e) override;
-
+	
 
 	void paint(Graphics &g) override;
 	void resized() override;
 
 	void setViewZoom(float value) override;
+
+	void updateItemsVisibility() override;
 
 	void showMenuAndAddItem(bool fromAddButton, Point<int> position) override;
 	
@@ -63,12 +64,9 @@ public:
 
 	void itemDropped(const SourceDetails &details) override;
 
+
 	static StateMachineView * create(const String &contentName) { return new StateMachineView(contentName, StateManager::getInstance()); }
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StateMachineView)
 };
-
-
-
-#endif  // STATEMACHINEVIEW_H_INCLUDED

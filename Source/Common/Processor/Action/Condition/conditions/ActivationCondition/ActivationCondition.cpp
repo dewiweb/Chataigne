@@ -14,7 +14,6 @@ ActivationCondition::ActivationCondition(var params) :
 	Condition(getTypeStringStatic((Type)(int)params.getProperty("type",ON_ACTIVATE))),
 	type((Type)(int)params.getProperty("type", ON_ACTIVATE))
 {
-	isValid->setValue(true);
 }
 
 ActivationCondition::~ActivationCondition()
@@ -26,8 +25,9 @@ void ActivationCondition::onContainerParameterChangedInternal(Parameter * p)
 	Condition::onContainerParameterChangedInternal(p);
 	if (p == enabled)
 	{
-		isValid->setValue(enabled->boolValue());
+	//	isValid->setValue(enabled->boolValue() && !forceDisabled);
 	}
+
 }
 
 var ActivationCondition::getJSONData()

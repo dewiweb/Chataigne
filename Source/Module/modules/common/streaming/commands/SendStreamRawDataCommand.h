@@ -21,5 +21,7 @@ public:
 
 	void triggerInternal() override;
 
+	void customValueCreated(Parameter * p, var data);
+
 	static SendStreamRawDataCommand * create(ControllableContainer * module, CommandContext context, var params) { return new SendStreamRawDataCommand((StreamingModule *)module, context, params); }
 };

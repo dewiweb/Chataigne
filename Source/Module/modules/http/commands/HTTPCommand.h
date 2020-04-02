@@ -13,8 +13,7 @@
 #include "../HTTPModule.h"
 
 class HTTPCommand :
-	public BaseCommand,
-	public CustomValuesCommandArgumentManager::ManagerListener
+	public BaseCommand
 {
 public:
 	HTTPCommand(HTTPModule * _module, CommandContext context, var params);
@@ -25,10 +24,11 @@ public:
 
 	StringParameter * address;
 	EnumParameter * method;
-	
-	void triggerInternal() override;
+	EnumParameter * resultDataType;
 
-	void useForMappingChanged(CustomValuesCommandArgument *) override;
+	StringParameter* extraHeaders;
+
+	void triggerInternal() override;
 
 	static BaseCommand * create(ControllableContainer * module, CommandContext context, var params) { return new HTTPCommand((HTTPModule *)module, context, params); }
 };

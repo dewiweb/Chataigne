@@ -21,16 +21,12 @@
 
 #include "Module/ModuleManager.h"
 #include "Module/modules/controller/wiimote/WiimoteManager.h"
+#include "Module/modules/controller/streamdeck/StreamDeckManager.h"
 #include "Module/Routing/ModuleRouterManager.h"
 #include "Module/Community/CommunityModuleManager.h"
 
 #include "StateMachine/StateManager.h"
-#include "TimeMachine/SequenceManager.h"
-
-
-#if JUCE_WINDOWS
-#include "Module/modules/controller/myo/MyoManager.h"
-#endif
+#include "TimeMachine/ChataigneSequenceManager.h"
 
 
 ControllableContainer * getAppSettings();
@@ -41,16 +37,18 @@ ChataigneEngine::ChataigneEngine() :
 	//ossiaDevice(nullptr)
 {
 	convertURL = "http://benjamin.kuperberg.fr/chataigne/releases/convert.php";
+	breakingChangesVersions.add("1.6.12b5");
+	breakingChangesVersions.add("1.7.0b1");
+	breakingChangesVersions.add("1.7.0b7");
 
 	//init here
 	Engine::mainEngine = this;
 	addChildControllableContainer(ModuleManager::getInstance());
 	addChildControllableContainer(StateManager::getInstance());
-	addChildControllableContainer(SequenceManager::getInstance());
+	addChildControllableContainer(ChataigneSequenceManager::getInstance());
 	addChildControllableContainer(ModuleRouterManager::getInstance());
 	addChildControllableContainer(CVGroupManager::getInstance());
 	
-
 	MIDIManager::getInstance(); //Trigger constructor, declare settings
 
 	CommunityModuleManager::getInstance(); //Trigger constructor, declare settings
@@ -74,7 +72,7 @@ ChataigneEngine::~ChataigneEngine()
 	CommunityModuleManager::deleteInstance();
 	ModuleRouterManager::deleteInstance();
 
-	SequenceManager::deleteInstance();
+	ChataigneSequenceManager::deleteInstance();
 	StateManager::deleteInstance();
 	ModuleManager::deleteInstance();
 
@@ -83,12 +81,9 @@ ChataigneEngine::~ChataigneEngine()
 	SerialManager::deleteInstance();
 	WiimoteManager::deleteInstance();
 
-#if JUCE_WINDOWS
 	InputSystemManager::deleteInstance();
-	MyoManager::deleteInstance();
-#endif
+	StreamDeckManager::deleteInstance();
 
-	ProjectSettings::deleteInstance();
 	ChataigneAssetManager::deleteInstance();
 
 	CVGroupManager::deleteInstance();
@@ -101,7 +96,7 @@ void ChataigneEngine::clearInternal()
 {
 	//clear
 	StateManager::getInstance()->clear();
-	SequenceManager::getInstance()->clear();
+	ChataigneSequenceManager::getInstance()->clear();
 
 	ModuleRouterManager::getInstance()->clear();
 	ModuleManager::getInstance()->clear();
@@ -117,19 +112,19 @@ var ChataigneEngine::getJSONData()
 	if(!pData.isVoid() && pData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("projectSettings", pData);
 
 	var mData = ModuleManager::getInstance()->getJSONData();
-	if(!mData.isVoid() && mData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("moduleManager", mData);
+	if(!mData.isVoid() && mData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ModuleManager::getInstance()->shortName, mData);
 
 	var cvData = CVGroupManager::getInstance()->getJSONData();
-	if (!cvData.isVoid() && cvData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("customVariables", cvData);
+	if (!cvData.isVoid() && cvData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(CVGroupManager::getInstance()->shortName, cvData);
 
 	var sData = StateManager::getInstance()->getJSONData();
-	if(!sData.isVoid() && sData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("stateManager", sData);
+	if(!sData.isVoid() && sData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(StateManager::getInstance()->shortName, sData);
 
-	var seqData = SequenceManager::getInstance()->getJSONData();
-	if(!seqData.isVoid() && seqData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("sequenceManager", seqData);
+	var seqData = ChataigneSequenceManager::getInstance()->getJSONData();
+	if(!seqData.isVoid() && seqData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ChataigneSequenceManager::getInstance()->shortName, seqData);
 
 	var rData = ModuleRouterManager::getInstance()->getJSONData();
-	if(!rData.isVoid() && rData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("routerManager", rData);
+	if(!rData.isVoid() && rData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(ModuleRouterManager::getInstance()->shortName, rData);
 
 	return data;
 }
@@ -151,27 +146,27 @@ void ChataigneEngine::loadJSONDataInternalEngine(var data, ProgressTask * loadin
 	projectTask->end();
 
 	moduleTask->start();
-	ModuleManager::getInstance()->loadJSONData(data.getProperty("moduleManager",var()));
+	ModuleManager::getInstance()->loadJSONData(data.getProperty(ModuleManager::getInstance()->shortName,var()));
 	moduleTask->setProgress(1);
 	moduleTask->end();
 
 	cvTask->start();
-	CVGroupManager::getInstance()->loadJSONData(data.getProperty("customVariables", var()));
+	CVGroupManager::getInstance()->loadJSONData(data.getProperty(CVGroupManager::getInstance()->shortName, var()));
 	cvTask->setProgress(1);
 	cvTask->end();
 
 	stateTask->start();
-	StateManager::getInstance()->loadJSONData(data.getProperty("stateManager",var()));
+	StateManager::getInstance()->loadJSONData(data.getProperty(StateManager::getInstance()->shortName,var()));
 	stateTask->setProgress(1);
 	stateTask->end();
 
 	sequenceTask->start();
-	SequenceManager::getInstance()->loadJSONData(data.getProperty("sequenceManager",var()));
+	ChataigneSequenceManager::getInstance()->loadJSONData(data.getProperty(ChataigneSequenceManager::getInstance()->shortName,var()));
 	sequenceTask->setProgress(1);
 	sequenceTask->end();
 	
 	routerTask->start();
-	ModuleRouterManager::getInstance()->loadJSONData(data.getProperty("routerManager",var()));
+	ModuleRouterManager::getInstance()->loadJSONData(data.getProperty(ModuleRouterManager::getInstance()->shortName,var()));
 	routerTask->setProgress(1);
 	routerTask->end();
 

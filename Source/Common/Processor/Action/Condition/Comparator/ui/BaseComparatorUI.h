@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef BASECOMPARATORUI_H_INCLUDED
-#define BASECOMPARATORUI_H_INCLUDED
+#pragma once
 
 #include "../BaseComparator.h"
 
@@ -23,7 +22,7 @@ public:
 
 	WeakReference<BaseComparator> comparator;
 
-	//std::unique_ptr<BoolToggleUI> alwaysDispatchUI;
+	std::unique_ptr<BoolToggleUI> alwaysTriggerUI;
 	std::unique_ptr<EnumParameterUI> compareFuncUI;
 
 	std::unique_ptr<ControllableEditor> refEditor;
@@ -31,8 +30,3 @@ public:
 
 	void newMessage(const Parameter::ParameterEvent &e) override;
 };
-
-
-
-
-#endif  // BASECOMPARATORUI_H_INCLUDED

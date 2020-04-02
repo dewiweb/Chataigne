@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef MAPPINGOUTPUTMANAGER_H_INCLUDED
-#define MAPPINGOUTPUTMANAGER_H_INCLUDED
-
+#pragma once
 
 #include "MappingOutput.h"
 
@@ -22,13 +20,14 @@ public:
 	MappingOutputManager();
 	~MappingOutputManager();
 
-	Parameter * outParam;
+	Array<WeakReference<Parameter>> outParams;
 
-	void setValue(var value);
+	void setOutParams(Array<Parameter *> params);
 
-	void setOutParam(Parameter * p);
-
+	void updateOutputValues();
 	void updateOutputValue(MappingOutput * o);
+
+	var getMergedOutValue();
 
 	void addItemInternal(MappingOutput * o, var) override;
 	void removeItemInternal(MappingOutput * o) override;
@@ -54,8 +53,3 @@ public:
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MappingOutputManager)
 
 };
-
-
-
-
-#endif  // MAPPINGOUTPUTMANAGER_H_INCLUDED

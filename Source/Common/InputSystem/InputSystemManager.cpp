@@ -10,7 +10,6 @@
 
 #include "InputSystemManager.h"
 
-#if JUCE_WINDOWS
 #include "InputDeviceHelpers.h"
 
 juce_ImplementSingleton(InputSystemManager)
@@ -176,24 +175,31 @@ void InputSystemManager::run()
 				}
 			}
 
+			Array<Joystick*> joysticksToRemove;
 			for (auto &j : joysticks)
 			{
 				//check removed devices
-				if (!SDL_JoystickGetAttached(j->joystick)) removeJoystick(j);
+				
+				if (!SDL_JoystickGetAttached(j->joystick)) joysticksToRemove.add(j);
 			}
+
+			for (auto& j : joysticksToRemove) removeJoystick(j);
 			
+			Array<Gamepad*> gamepadsToRemove;
 			for (auto &g : gamepads)
 			{
 				//check removed devices
-				DBG("Check if device is opened : " << (int)SDL_GameControllerGetAttached(g->gamepad));
-				if (!SDL_GameControllerGetAttached(g->gamepad)) removeGamepad(g);
+				if (!SDL_GameControllerGetAttached(g->gamepad)) gamepadsToRemove.add(g);
 			}
+			for (auto& g : gamepadsToRemove) removeGamepad(g);
+
 			
 			lastCheckTime = Time::getApproximateMillisecondCounter();
 		}
 
 		SDL_JoystickUpdate();
 		SDL_GameControllerUpdate();
+
 		for (auto &j : joysticks) j->update();
 		for (auto &g : gamepads) g->update();
 
@@ -215,6 +221,8 @@ Joystick::Joystick(SDL_Joystick * joystick) :
 	for (int i = 0; i <  numAxes; i++)
 	{
 		FloatParameter * f = axesCC.addFloatParameter("Axis " + String(i + 1), "", 0, -1, 1);
+		axisOffset[i] = 0;
+		axisDeadZone[i] = 0;
 		f->isControllableFeedbackOnly = true;
 	}
 
@@ -234,16 +242,32 @@ Joystick::~Joystick()
 void Joystick::update()
 {
 	int numAxes = SDL_JoystickNumAxes(joystick);
-	for (int i = 0; i < numAxes; i++)
+	if (axesCC.controllables.size() == numAxes)
 	{
-		((FloatParameter *)axesCC.controllables[i])->setValue(jmap<float>((float)SDL_JoystickGetAxis(joystick, i), INT16_MIN, INT16_MAX, -1, 1));
+		GenericScopedLock lock(axesCC.controllables.getLock());
+		for (int i = 0; i < numAxes; i++)
+		{
+			float axisValue = jmap<float>((float)SDL_JoystickGetAxis(joystick, i), INT16_MIN, INT16_MAX, -1, 1) + axisOffset[i];
+			if (fabs(axisValue) < axisDeadZone[i]) axisValue = 0;
+			else
+			{
+				if (axisValue > 0) axisValue = jmap<float>(axisValue, axisDeadZone[i], 1 + axisOffset[i], 0, 1);
+				else axisValue = jmap<float>(axisValue, -1 + axisOffset[i], -axisDeadZone[i], -1, 0);
+			}
+			((FloatParameter*)axesCC.controllables[i])->setValue(axisValue);
+		}
 	}
 
 	int numButtons = SDL_JoystickNumButtons(joystick);
-	for (int i = 0; i < numButtons; i++)
+	if (buttonsCC.controllables.size() == numButtons)
 	{
-		((BoolParameter *)buttonsCC.controllables[i])->setValue(SDL_JoystickGetButton(joystick, i) > 0);
+		GenericScopedLock lock(buttonsCC.controllables.getLock());
+		for (int i = 0; i < numButtons; i++)
+		{
+			((BoolParameter*)buttonsCC.controllables[i])->setValue(SDL_JoystickGetButton(joystick, i) > 0);
+		}
 	}
+	
 
 }
 
@@ -258,6 +282,8 @@ Gamepad::Gamepad(SDL_GameController * gamepad) :
 
 		FloatParameter * f = axesCC.addFloatParameter(SDL_GameControllerGetStringForAxis(a), "", 0, -1, 1);
 		f->isControllableFeedbackOnly = true;
+		axisOffset[i] = 0;
+		axisDeadZone[i] = 0;
 	}
 
 	for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
@@ -275,14 +301,30 @@ Gamepad::~Gamepad()
 
 void Gamepad::update()
 {
-	for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++)
+	if (axesCC.controllables.size() == SDL_CONTROLLER_AXIS_MAX)
 	{
-		((FloatParameter *)axesCC.controllables[i])->setValue(jmap<float>((float)SDL_GameControllerGetAxis(gamepad, (SDL_GameControllerAxis)i), INT16_MIN, INT16_MAX, -1, 1)); 
+		ScopedLock(axesCC.controllables.getLock());
+		for (int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++)
+		{
+			float axisValue = jmap<float>((float)SDL_GameControllerGetAxis(gamepad, (SDL_GameControllerAxis)i), INT16_MIN, INT16_MAX, -1, 1) + axisOffset[i];
+			if (fabs(axisValue) < axisDeadZone[i]) axisValue = 0;
+			else
+			{
+				if (axisValue > 0) axisValue = jmap<float>(axisValue, axisDeadZone[i], 1 + axisOffset[i], 0, 1);
+				else axisValue = jmap<float>(axisValue, -1 + axisOffset[i], -axisDeadZone[i], -1, 0);
+			}
+			((FloatParameter*)axesCC.controllables[i])->setValue(axisValue);
+		}
 	}
 
-	for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+	if (buttonsCC.controllables.size() == SDL_CONTROLLER_BUTTON_MAX)
 	{
-		((BoolParameter *)buttonsCC.controllables[i])->setValue(SDL_GameControllerGetButton(gamepad, (SDL_GameControllerButton)i) > 0);
+		ScopedLock(buttonsCC.controllables.getLock());
+		for (int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+		{
+			((BoolParameter*)buttonsCC.controllables[i])->setValue(SDL_GameControllerGetButton(gamepad, (SDL_GameControllerButton)i) > 0);
+		}
+
 	}
 }
 
@@ -425,5 +467,3 @@ ControllableUI * GamepadParameter::createDefaultUI(Controllable *)
 {
 	return new GamepadParameterUI(this);
 }
-
-#endif

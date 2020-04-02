@@ -13,8 +13,9 @@
 
 Mapping::Mapping(bool canBeDisabled) :
 	Processor("Mapping", canBeDisabled),
-	outputParam(nullptr),
-    processMode(VALUE_CHANGE),
+	processMode(VALUE_CHANGE),
+	isRebuilding(false),
+	isProcessing(false),
     inputIsLocked(false),
     mappingAsyncNotifier(10)
 {
@@ -24,13 +25,12 @@ Mapping::Mapping(bool canBeDisabled) :
 	continuousProcess = addBoolParameter("Continuous", "If enabled, the mapping will process continuously rather than only when parameter value has changed", false);
 	continuousProcess->hideInEditor = true;
 
-	addChildControllableContainer(&input);
-	//addChildControllableContainer(&cdm);
+	addChildControllableContainer(&im);
 	addChildControllableContainer(&fm);
 	addChildControllableContainer(&om);
 
-	fm.addAsyncManagerListener(this);
-	input.addMappingInputListener(this);
+	fm.addFilterManagerListener(this);
+	im.addBaseManagerListener(this);
 
 	helpID = "Mapping";
 }
@@ -58,11 +58,11 @@ void Mapping::setProcessMode(ProcessMode mode)
 	}
 }
 
-void Mapping::lockInputTo(Parameter * lockParam)
+void Mapping::lockInputTo(Array<Parameter *> lockParams)
 {
-	inputIsLocked = lockParam != nullptr;
-	input.lockInput(lockParam);
-	input.hideInEditor = inputIsLocked;
+	inputIsLocked = lockParams.size() > 0;
+	im.lockInput(lockParams);
+	im.hideInEditor = inputIsLocked;
 }
 
 void Mapping::checkFiltersNeedContinuousProcess()
@@ -86,37 +86,30 @@ void Mapping::checkFiltersNeedContinuousProcess()
 	continuousProcess->setValue(need);
 }
 
-void Mapping::updateMappingChain()
+void Mapping::updateMappingChain(MappingFilter * afterThisFilter)
 {
-	checkFiltersNeedContinuousProcess();
-	Parameter * p = fm.getLastEnabledFilter() != nullptr ? fm.getLastEnabledFilter()->filteredParameter.get() : input.inputReference.get();
+	if (isCurrentlyLoadingData || isClearing) return;
+	if (isRebuilding) return;
 
-	if (outputParam == nullptr && p == nullptr) return;
+	stopTimer();
+	{
+		//enter in scope for lock
+		GenericScopedLock lock(mappingLock);
+		isRebuilding = true;
 
-	if (outputParam == nullptr || p == nullptr || outputParam->type != p->type)
-	{		
-		if (outputParam != nullptr) removeControllable(outputParam);
-		outputParam = nullptr;
+		if(afterThisFilter == nullptr) fm.setupSources(im.getInputReferences()); //do the whole rebuild
+		else fm.rebuildFilterChain(afterThisFilter); //only ask to rebuild after the changed filter
 
-		if (p != nullptr)
-		{ 
-			outputParam = ControllableFactory::createParameterFrom(p, false, true);
-			outputParam->setNiceName("Out value");
-			outputParam->setControllableFeedbackOnly(true);
-			outputParam->hideInEditor = true;
-		}
+		Array<Parameter*> processedParams = fm.getLastFilteredParameters();
+		om.setOutParams(processedParams);
 
-		om.setOutParam(outputParam);
 		mappingAsyncNotifier.addMessage(new MappingEvent(MappingEvent::OUTPUT_TYPE_CHANGED, this));
 
-		if (outputParam != nullptr)
-		{
-			addParameter(outputParam);
-		}
-	} else
-	{
-		outputParam->setRange(p->minimumValue, p->maximumValue);
+		checkFiltersNeedContinuousProcess();
+
+		isRebuilding = false;
 	}
+
 
 	process();
 }
@@ -124,22 +117,24 @@ void Mapping::updateMappingChain()
 void Mapping::process(bool forceOutput)
 {
 	if ((canBeDisabled && !enabled->boolValue()) || forceDisabled) return;
-	if (input.inputReference == nullptr) return;
-	//if (!cdm.getIsValid(true)) return;
+	if (im.items.size() == 0) return;
+	if (isCurrentlyLoadingData || isRebuilding || isProcessing) return;
 
-	Parameter * filteredParam = fm.processFilters();
-	if (filteredParam == nullptr) return;
+	//DBG("[PROCESS] Enter lock");
+	GenericScopedLock lock(mappingLock);
+	isProcessing = true;
+	Array<Parameter *> filteredParams = fm.processFilters();
+	om.updateOutputValues();
+	isProcessing = false;
 
-	if (outputParam == nullptr) updateMappingChain();
-	if (outputParam == nullptr) return;
-	outputParam->setValue(filteredParam->getValue(), false, processMode == MANUAL || forceOutput);
+	//DBG("[PROCESS] Exit lock");
+
 }
 
 var Mapping::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("input", input.getJSONData());
-	//data.getDynamicObject()->setProperty("conditions", cdm.getJSONData());
+	data.getDynamicObject()->setProperty("im", im.getJSONData());
 	data.getDynamicObject()->setProperty("filters", fm.getJSONData());
 	data.getDynamicObject()->setProperty("outputs", om.getJSONData());
 	return data;
@@ -148,13 +143,32 @@ var Mapping::getJSONData()
 void Mapping::loadJSONDataInternal(var data)
 {
 	Processor::loadJSONDataInternal(data);
-	input.loadJSONData(data.getProperty("input", var()));
-	//cdm.loadJSONData(data.getProperty("conditions", var()));
+	if(!inputIsLocked) im.loadJSONData(data.getProperty("im", var()));
 	fm.loadJSONData(data.getProperty("filters", var()));
 	om.loadJSONData(data.getProperty("outputs", var()));
 
-	fm.setupSource(input.inputReference);
+	updateMappingChain();
+}
 
+void Mapping::afterLoadJSONDataInternal()
+{
+	updateMappingChain();
+}
+
+void Mapping::itemAdded(MappingInput* item)
+{
+	item->addMappingInputListener(this);
+	if(item->inputReference != nullptr) updateMappingChain();
+}
+
+void Mapping::itemRemoved(MappingInput* item)
+{
+	item->removeMappingInputListener(this);
+	updateMappingChain();
+}
+
+void Mapping::itemsReordered()
+{
 	updateMappingChain();
 }
 
@@ -162,7 +176,6 @@ void Mapping::inputReferenceChanged(MappingInput *)
 {
 	if (Engine::mainEngine->isClearing) return;
 
-	fm.setupSource(input.inputReference);
 	updateMappingChain();
 }
 
@@ -173,7 +186,8 @@ void Mapping::inputParameterValueChanged(MappingInput *)
 
 void Mapping::inputParameterRangeChanged(MappingInput *)
 {
-	if (fm.items.size() == 0) outputParam->setRange(input.inputReference->minimumValue, input.inputReference->maximumValue);
+	updateMappingChain();
+	//if (fm.items.size() == 0) outputParam->setRange(input.inputReference->minimumValue, input.inputReference->maximumValue);
 }
 
 void Mapping::onContainerParameterChangedInternal(Parameter * p)
@@ -183,47 +197,31 @@ void Mapping::onContainerParameterChangedInternal(Parameter * p)
 	{
 		if (continuousProcess->boolValue()) startTimerHz(30);
 		else stopTimer();
-	} else if (p == outputParam)
-	{
-		om.setValue(outputParam->getValue());
-	} else if (p == enabled && enabled->boolValue() && !forceDisabled)
+	}
+	else if (p == enabled && enabled->boolValue() && !forceDisabled)
 	{
 		process();
 	}
 }
 
-void Mapping::newMessage(const MappingFilterManager::ManagerEvent & e)
+void Mapping::filterManagerNeedsRebuild(MappingFilter* afterThisFilter)
 {
-	if (e.type == MappingFilterManager::ManagerEvent::ITEM_ADDED)
-	{
-		e.getItem()->addMappingFilterListener(this);
-		e.getItem()->addAsyncFilterListener(this);
-	}
-	updateMappingChain();
+	updateMappingChain(afterThisFilter);
 }
 
-void Mapping::filteredParamRangeChanged(MappingFilter * mf)
+void Mapping::filterManagerNeedsProcess()
 {
-	if (mf == fm.getLastEnabledFilter())
-	{
-		//Last item
-		outputParam->setRange(mf->filteredParameter->minimumValue, mf->filteredParameter->maximumValue);
-	}
+	process();
 }
 
-void Mapping::newMessage(const MappingFilter::FilterEvent & e)
-{
-	if (e.type == MappingFilter::FilterEvent::FILTER_PARAM_CHANGED)
-	{
-		process();
-	}
-}
 
 void Mapping::clearItem()
 {
-	fm.removeAsyncManagerListener(this);
-	input.removeMappingInputListener(this); 
-	input.clear();
+	BaseItem::clearItem();
+
+	fm.removeFilterManagerListener(this);
+	im.removeBaseManagerListener(this); 
+	im.clear();
 }
 
 ProcessorUI * Mapping::getUI()
@@ -240,7 +238,12 @@ void Mapping::timerCallback()
 void Mapping::highlightLinkedInspectables(bool value)
 {
 	Processor::highlightLinkedInspectables(value);
-	input.highlightLinkedInspectables(value);
+
+	for (auto& i : im.items)
+	{
+		i->highlightLinkedInspectables(value);
+	}
+
 	for (auto & o : om.items)
 	{
 		o->highlightLinkedInspectables(value);

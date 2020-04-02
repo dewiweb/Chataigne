@@ -14,29 +14,32 @@
 #include "conditions/ConditionGroup/ConditionGroup.h"
 #include "conditions/ScriptCondition/ScriptCondition.h"
 #include "conditions/ActivationCondition/ActivationCondition.h"
+#include "Common/Processor/Action/Action.h"
 
 juce_ImplementSingleton(ConditionManager)
 
-ConditionManager::ConditionManager(bool _operatorOnSide) :
+ConditionManager::ConditionManager() :
 	BaseManager<Condition>("Conditions"),
 	activateDef(nullptr),
 	deactivateDef(nullptr),
-    operatorOnSide(_operatorOnSide),
     validationProgress(nullptr),
+	validationWaiting(false),
+    prevTimerTime(0),
     forceDisabled(false)
 {
-	
+	canBeCopiedAndPasted = true;
+
 	managerFactory = &factory;
 	factory.defs.add(Factory<Condition>::Definition::createDef("", StandardCondition::getTypeStringStatic(), &StandardCondition::create));
 	factory.defs.add(Factory<Condition>::Definition::createDef("", ConditionGroup::getTypeStringStatic(), &ConditionGroup::create));
 	factory.defs.add(Factory<Condition>::Definition::createDef("", ScriptCondition::getTypeStringStatic(), &ScriptCondition::create));
-	
 	
 	selectItemWhenCreated = false;
 
 	isValid = addBoolParameter("Is Valid","Indicates if all the conditions are valid. If so, the consequences are triggered one time, at the moment the action becomes valid.",false);
 	isValid->isControllableFeedbackOnly = true;
 	isValid->hideInEditor = true;
+	isValid->isSavable = false;
 
 	conditionOperator = addEnumParameter("Operator", "Operator for this manager, will decides how the conditions are validated");
 	conditionOperator->addOption("AND", ConditionOperator::AND);
@@ -51,12 +54,13 @@ ConditionManager::ConditionManager(bool _operatorOnSide) :
 	validationProgress->setControllableFeedbackOnly(true);
 	validationProgress->setEnabled(false);
 	validationProgress->hideInEditor = true;
+	validationProgress->isSavable = false;
+
 }
 
 ConditionManager::~ConditionManager()
 {
 }
-
 
 void ConditionManager::setHasActivationDefinitions(bool value)
 {
@@ -64,8 +68,8 @@ void ConditionManager::setHasActivationDefinitions(bool value)
 	{
 		if (activateDef == nullptr && deactivateDef == nullptr)
 		{
-			activateDef = Factory<Condition>::Definition::createDef("", ActivationCondition::getTypeStringStatic(ActivationCondition::ON_ACTIVATE), &ActivationCondition::create)->addParam("type", ActivationCondition::ON_ACTIVATE);
-			deactivateDef = Factory<Condition>::Definition::createDef("", ActivationCondition::getTypeStringStatic(ActivationCondition::ON_DEACTIVATE), &ActivationCondition::create)->addParam("type", ActivationCondition::ON_DEACTIVATE);
+			activateDef = (Factory<Condition>::Definition *)Factory<Condition>::Definition::createDef("", ActivationCondition::getTypeStringStatic(ActivationCondition::ON_ACTIVATE), &ActivationCondition::create)->addParam("type", ActivationCondition::ON_ACTIVATE);
+			deactivateDef = (Factory<Condition>::Definition *)Factory<Condition>::Definition::createDef("", ActivationCondition::getTypeStringStatic(ActivationCondition::ON_DEACTIVATE), &ActivationCondition::create)->addParam("type", ActivationCondition::ON_DEACTIVATE);
 			factory.defs.add(activateDef);
 			factory.defs.add(deactivateDef);
 			factory.buildPopupMenu();
@@ -82,11 +86,18 @@ void ConditionManager::setHasActivationDefinitions(bool value)
 
 void ConditionManager::addItemInternal(Condition * c, var data)
 {
+	c->setForceDisabled(forceDisabled);
 	c->addConditionListener(this);
 	conditionOperator->hideInEditor = items.size() <= 1;
 	validationTime->hideInEditor = items.size() == 0;
 	validationProgress->hideInEditor = items.size() == 0;
-	checkAllConditions();
+	
+	StandardCondition* sc = dynamic_cast<StandardCondition*>(c);
+	if (sc != nullptr)
+	{
+		Action* a = ControllableUtil::findParentAs<Action>(this);
+		sc->sourceTarget->warningResolveInspectable = a != nullptr ? (Inspectable*)a : this;
+	}
 }
 
 void ConditionManager::removeItemInternal(Condition * c)
@@ -95,15 +106,17 @@ void ConditionManager::removeItemInternal(Condition * c)
 	conditionOperator->hideInEditor = items.size() <= 1;
 	validationTime->hideInEditor = items.size() == 0;
 	validationProgress->hideInEditor = items.size() == 0;
-	checkAllConditions();
+	if(!Engine::mainEngine->isLoadingFile && !Engine::mainEngine->isClearing) checkAllConditions();
 }
 
 void ConditionManager::setForceDisabled(bool value, bool force)
 {
-	if (forceDisabled == value && !force) return;
+	if (forceDisabled == value && !force) return; 
 	forceDisabled = value;
 	if (forceDisabled) isValid->setValue(false);
-	for (auto &i : items) i->forceDisabled = value;
+	for (auto &i : items) i->setForceDisabled(value);
+
+	checkAllConditions();
 }
 
 void ConditionManager::checkAllConditions(bool emptyIsValid, bool dispatchOnlyOnValidationChange)
@@ -164,6 +177,12 @@ void ConditionManager::onContainerParameterChanged(Parameter * p)
 	{
 		checkAllConditions();
 	}
+}
+
+void ConditionManager::loadJSONDataInternal(var data)
+{
+	BaseManager::loadJSONDataInternal(data);
+	checkAllConditions();
 }
 
 

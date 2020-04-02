@@ -8,19 +8,16 @@
   ==============================================================================
 */
 
-#ifndef MAPPINGINPUT_H_INCLUDED
-#define MAPPINGINPUT_H_INCLUDED
+#pragma once
 
 #include "JuceHeader.h"
 
 class MappingInput :
-	public ControllableContainer
+	public BaseItem
 {
 public:
 	MappingInput();
 	~MappingInput();
-
-	
 
 	TargetParameter * inputTarget;
 	WeakReference<Parameter> inputReference;
@@ -28,7 +25,7 @@ public:
 	void lockInput(Parameter * input);
 	void setInput(Parameter * input);
 
-	void onContainerParameterChanged(Parameter * p) override;
+	void onContainerParameterChangedInternal(Parameter * p) override;
 	void onExternalParameterValueChanged(Parameter *p) override;
 
 	void parameterRangeChanged(Parameter * p) override;
@@ -68,7 +65,3 @@ public:
 	void removeAsyncMappingInputListener(AsyncListener* listener) { mappingInputAsyncNotifier.removeListener(listener); }
 
 };
-
-
-
-#endif  // MAPPINGINPUT_H_INCLUDED

@@ -8,10 +8,10 @@
   ==============================================================================
 */
 
-#ifndef SIMPLEREMAPFILTER_H_INCLUDED
-#define SIMPLEREMAPFILTER_H_INCLUDED
+#pragma once
 
 #include "../../MappingFilter.h"
+
 
 class SimpleRemapFilter :
 	public MappingFilter
@@ -24,19 +24,13 @@ public:
 	Point2DParameter * targetIn;
 	Point2DParameter * targetOut;
 
-
-	void processInternal() override;
+	Parameter * setupSingleParameterInternal(Parameter * source) override;
+	void processSingleParameterInternal(Parameter * source, Parameter * out) override;
 
 	void filterParamChanged(Parameter *) override;
-
-	Parameter * setupParameterInternal(Parameter * source) override;
 
 	static SimpleRemapFilter * create(var params) { return new SimpleRemapFilter(params); }
 	String getTypeString() const override { return "Remap"; }
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleRemapFilter)
 };
-
-
-
-#endif  // SIMPLEREMAPFILTER_H_INCLUDED

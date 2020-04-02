@@ -18,10 +18,7 @@ port(_port),
 info(_info),
 mode(_mode)
 {
-	DBG("NEW SERIAL DEVICE");
 	open();
-
-	
 }
 #else
 SerialDevice::SerialDevice(SerialDeviceInfo  * _info, PortMode _mode) :
@@ -142,17 +139,14 @@ bool SerialDevice::isOpen() {
 #endif
 }
 
-int SerialDevice::writeString(String message, bool endLine)
+int SerialDevice::writeString(String message)
 {
 #if SERIALSUPPORT
 	if (!port->isOpen()) return 0;
 
-	//DBG("Write string : " << message << " -- endline ? " << String(endLine));
-	String m = message;
-	if (endLine) m += "\n";
 	try
 	{
-		return (int)port->write(m.toStdString());
+		return (int)port->write(message.toStdString());
 	}
 	catch (std::exception e)
 	{
@@ -168,7 +162,16 @@ int SerialDevice::writeString(String message, bool endLine)
 int SerialDevice::writeBytes(Array<uint8_t> data)
 {
 #if SERIALSUPPORT
-	return (int)port->write(data.getRawDataPointer(), data.size());
+	try
+	{
+		int result = (int)port->write(data.getRawDataPointer(), data.size());
+		return result;
+	}
+	catch (std::exception e)
+	{
+		NLOGERROR("Serial", "Error writing to serial : " << e.what());
+		return 0;
+	}
 #else
 	return 0;
 #endif
@@ -207,7 +210,7 @@ void SerialReadThread::run()
 
 	while (!threadShouldExit())
 	{
-		sleep(10); //100fps
+		sleep(2); //500fps
 
 		if (port == nullptr) return;
 		if (!port->isOpen()) return;
@@ -223,13 +226,11 @@ void SerialReadThread::run()
 
 			case SerialDevice::PortMode::LINES:
 			{
-
-				std::string line = port->port->readline();
-				if (line.size() > 0)
+				while (port->port->available() && port->mode == SerialDevice::PortMode::LINES)
 				{
-					serialThreadListeners.call(&SerialThreadListener::dataReceived, var(line));
+					std::string line = port->port->readline();
+					if(line.size() > 0) serialThreadListeners.call(&SerialThreadListener::dataReceived, var(line));
 				}
-
 			}
 			break;
 
@@ -244,7 +245,7 @@ void SerialReadThread::run()
 
 			case SerialDevice::PortMode::DATA255:
 			{
-				while (port->port->available())
+				while (port->port->available() && port->mode == SerialDevice::PortMode::DATA255)
 				{
 					uint8_t b = port->port->read(1)[0];
 					if (b == 255)
@@ -262,15 +263,15 @@ void SerialReadThread::run()
 
 			case SerialDevice::PortMode::COBS:
 			{
-				while (port->port->available())
+				while (port->port->available() && port->mode == SerialDevice::PortMode::COBS)
 				{
 					uint8_t b = port->port->read(1)[0];
 					byteBuffer.push_back(b);
 					if (b == 0)
 					{
 						uint8_t decodedData[255];
-						size_t numDecoded = cobs_decode(byteBuffer.data(), byteBuffer.size(), decodedData); 
-						serialThreadListeners.call(&SerialThreadListener::dataReceived, var(decodedData, numDecoded));
+						size_t numDecoded = cobs_decode(byteBuffer.data(), byteBuffer.size(), decodedData);
+						serialThreadListeners.call(&SerialThreadListener::dataReceived, var(decodedData, numDecoded - 1));
 						byteBuffer.clear();
 					}
 				}				

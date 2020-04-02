@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SEQUENCECOMMAND_H_INCLUDED
-#define SEQUENCECOMMAND_H_INCLUDED
+#pragma once
 
 #include "Common/Command/BaseCommand.h"
 
@@ -23,7 +22,7 @@ public:
 	SequenceCommand(SequenceModule * _module, CommandContext context, var params);
 	virtual ~SequenceCommand();
 
-	enum ActionType { PLAY_SEQUENCE, PAUSE_SEQUENCE, STOP_SEQUENCE, TOGGLE_SEQUENCE, ENABLE_LAYER, DISABLE_LAYER, TOGGLE_LAYER, SET_TIME, GOTO_CUE};
+	enum ActionType { PLAY_SEQUENCE, PAUSE_SEQUENCE, STOP_SEQUENCE, STOP_ALL_SEQUENCES, TOGGLE_SEQUENCE, ENABLE_LAYER, DISABLE_LAYER, TOGGLE_LAYER, SET_TIME, MOVE_TIME, GOTO_CUE};
 
 	ActionType actionType;
 	SequenceModule * sequenceModule;
@@ -42,7 +41,3 @@ public:
 
 	static BaseCommand * create(ControllableContainer * module, CommandContext context, var params);
 };
-
-
-
-#endif  // SEQUENCECOMMAND_H_INCLUDED

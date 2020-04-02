@@ -40,12 +40,14 @@
 #endif
 
 #ifndef JUCE_REPORT_APP_USAGE
- #define JUCE_REPORT_APP_USAGE 1
+ #define JUCE_REPORT_APP_USAGE 0
 #endif
 
 // END SECTION A
 
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
+
+#define JUCE_PROJUCER_VERSION 0x50407
 
 //==============================================================================
 #define JUCE_MODULE_AVAILABLE_juce_analytics             1
@@ -65,6 +67,7 @@
 #define JUCE_MODULE_AVAILABLE_juce_opengl                1
 #define JUCE_MODULE_AVAILABLE_juce_organicui             1
 #define JUCE_MODULE_AVAILABLE_juce_osc                   1
+#define JUCE_MODULE_AVAILABLE_juce_timeline              1
 #define JUCE_MODULE_AVAILABLE_juce_video                 1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
@@ -128,15 +131,15 @@
 #endif
 
 #ifndef    JUCE_USE_MP3AUDIOFORMAT
- //#define JUCE_USE_MP3AUDIOFORMAT 0
+ #define   JUCE_USE_MP3AUDIOFORMAT 1
 #endif
 
 #ifndef    JUCE_USE_LAME_AUDIO_FORMAT
- //#define JUCE_USE_LAME_AUDIO_FORMAT 0
+ #define   JUCE_USE_LAME_AUDIO_FORMAT 1
 #endif
 
 #ifndef    JUCE_USE_WINDOWS_MEDIA_FORMAT
- //#define JUCE_USE_WINDOWS_MEDIA_FORMAT 1
+ #define   JUCE_USE_WINDOWS_MEDIA_FORMAT 1
 #endif
 
 //==============================================================================
@@ -193,7 +196,7 @@
 #endif
 
 #ifndef    JUCE_USE_CURL
- //#define JUCE_USE_CURL 0
+ //#define JUCE_USE_CURL 1
 #endif
 
 #ifndef    JUCE_LOAD_CURL_SYMBOLS_LAZILY
@@ -201,7 +204,7 @@
 #endif
 
 #ifndef    JUCE_CATCH_UNHANDLED_EXCEPTIONS
- //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS 1
+ //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS 0
 #endif
 
 #ifndef    JUCE_ALLOW_STATIC_NULL_VARIABLES
@@ -238,8 +241,8 @@
 //==============================================================================
 // juce_events flags:
 
-#ifndef    JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
- //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK 0
+#ifndef    JUCE_EXECUTE_APP_SUSPEND_ON_BACKGROUND_TASK
+ //#define JUCE_EXECUTE_APP_SUSPEND_ON_BACKGROUND_TASK 0
 #endif
 
 //==============================================================================
@@ -306,11 +309,34 @@
  #define   ORGANICUI_USE_SERVUS 1
 #endif
 
+#ifndef    ORGANICUI_DEFAULT_REMOTECONTROL_PORT
+ //#define ORGANICUI_DEFAULT_REMOTECONTROL_PORT 0
+#endif
+
 //==============================================================================
 // juce_osc flags:
 
 #ifndef    JUCE_ALLOW_SPECIAL_CHARS_IN_ADDRESS
  #define   JUCE_ALLOW_SPECIAL_CHARS_IN_ADDRESS 1
+#endif
+
+#ifndef    JUCE_ENABLE_BROADCAST_BY_DEFAULT
+ #define   JUCE_ENABLE_BROADCAST_BY_DEFAULT 1
+#endif
+
+#ifndef    JUCE_EXCLUSIVE_BINDING_BY_DEFAULT
+ #define   JUCE_EXCLUSIVE_BINDING_BY_DEFAULT 1
+#endif
+
+//==============================================================================
+// juce_timeline flags:
+
+#ifndef    TIMELINE_USE_SEQUENCEMANAGER_SINGLETON
+ #define   TIMELINE_USE_SEQUENCEMANAGER_SINGLETON 0
+#endif
+
+#ifndef    TIMELINE_ADD_MENU_ITEMS
+ //#define TIMELINE_ADD_MENU_ITEMS 1
 #endif
 
 //==============================================================================

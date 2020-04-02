@@ -8,20 +8,20 @@
   ==============================================================================
 */
 
-#ifndef CustomValuesCommandArgumentMANAGER_H_INCLUDED
-#define CustomValuesCommandArgumentMANAGER_H_INCLUDED
+#pragma once
 
 #include "CustomValuesCommandArgument.h"
 
 class CustomValuesCommandArgumentManager :
 	public BaseManager<CustomValuesCommandArgument>,
 	public CustomValuesCommandArgument::ArgumentListener,
-	public BaseManager<CustomValuesCommandArgument>::Listener
+	public BaseManager<CustomValuesCommandArgument>::ManagerListener
 {
 public:
 	CustomValuesCommandArgumentManager(bool _mappingEnabled, bool templateMode = false);
 	~CustomValuesCommandArgumentManager();
 
+	bool isBeingDestroyed; //to keep track for templates, do not sync on destroy, so we can keep a ghost
 	bool mappingEnabled;
 	bool templateMode;
 
@@ -30,43 +30,40 @@ public:
 	CustomValuesCommandArgumentManager * linkedTemplateManager;
 	WeakReference<Inspectable> linkedTemplateManagerRef;
 
+	std::function<void(Parameter*, var)> createParamCallbackFunc;
+
 	void linkToTemplate(CustomValuesCommandArgumentManager * t);
-	void rebuildFromTemplate();
+	void rebuildFromTemplate(bool clearData);
 
 	CustomValuesCommandArgument * addItemWithParam(Parameter * p, var data = var(), bool fromUndoableAction = false);
 	CustomValuesCommandArgument * addItemFromType(Parameter::Type type, var data = var(), bool fromUndoableAction = false);
-
+	Parameter * createParameterFromType(Parameter::Type type, var data = var(), int index = 0);
 	CustomValuesCommandArgument * addItemFromData(var data, bool fromUndoableAction = false) override;
 
 	void autoRenameItems();
+	
 	void removeItemInternal(CustomValuesCommandArgument * i) override;
 
-
-	void useForMappingChanged(CustomValuesCommandArgument * i) override;
-
-	void controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c) override;
+	void useForMappingChanged(CustomValuesCommandArgument * i = nullptr) override;
 
 	void itemAdded(CustomValuesCommandArgument * i) override; //FROM TEMPLATE
 	void itemRemoved(CustomValuesCommandArgument * i) override; //FROM TEMPLATE
+	void itemsReordered() override;
+	void loadJSONDataInternal(var data) override;
 
 	InspectableEditor * getEditor(bool isRoot) override;
 
-	class  ManagerListener
+	class  ArgumentManagerListener
 	{
 	public:
 		/** Destructor. */
-		virtual ~ManagerListener() {}
+		virtual ~ArgumentManagerListener() {}
 		virtual void useForMappingChanged(CustomValuesCommandArgument *) {};
 	};
 
-	ListenerList<ManagerListener> argumentManagerListeners;
-	void addArgumentManagerListener(ManagerListener* newListener) { argumentManagerListeners.add(newListener); }
-	void removeArgumentManagerListener(ManagerListener* listener) { argumentManagerListeners.remove(listener); }
+	ListenerList<ArgumentManagerListener> argumentManagerListeners;
+	void addArgumentManagerListener(ArgumentManagerListener* newListener) { argumentManagerListeners.add(newListener); }
+	void removeArgumentManagerListener(ArgumentManagerListener* listener) { argumentManagerListeners.remove(listener); }
 
 
 };
-
-
-
-
-#endif  // CustomValuesCommandArgumentMANAGER_H_INCLUDED

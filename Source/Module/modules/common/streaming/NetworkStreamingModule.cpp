@@ -10,14 +10,23 @@
 
 #include "NetworkStreamingModule.h"
 #include "../ui/EnablingNetworkControllableContainerEditor.h"
+#include "Common/Serial/lib/cobs/cobs.h"
 
 NetworkStreamingModule::NetworkStreamingModule(const String &name, bool canHaveInput, bool canHaveOutput, int defaultLocalPort, int defaultRemotePort) :
 	StreamingModule(name),
-	Thread("stream_"+name)
+	Thread("stream_"+name),
+	receiveFrequency(nullptr),
+    useLocal(nullptr),
+    remoteHost(nullptr),
+	remotePort(nullptr),
+    senderIsConnected(nullptr)
 {
 	setupIOConfiguration(canHaveInput, canHaveOutput);
 
+
 	//Receive
+	receiveFrequency = new IntParameter("Receive Frequency", "The frequency at which to receive data, only change it if you need much high frequency", 100, 1, 1000);
+	
 	if (canHaveInput)
 	{
 		receiveCC.reset(new EnablingControllableContainer("Input"));
@@ -26,9 +35,14 @@ NetworkStreamingModule::NetworkStreamingModule(const String &name, bool canHaveI
 		moduleParams.addChildControllableContainer(receiveCC.get());
 
 		localPort = receiveCC->addIntParameter("Local Port", "Local Port to bind", defaultLocalPort, 1, 65535);
-
+		localPort->warningResolveInspectable = this;
 		receiverIsBound = receiveCC->addBoolParameter("Is Bound", "Will be active if receiver is bound", false);
 		receiverIsBound->isControllableFeedbackOnly = true;
+		receiveCC->addParameter(receiveFrequency);
+	}
+	else
+	{
+		moduleParams.addParameter(receiveFrequency);
 	}
 
 	//Send
@@ -40,10 +54,18 @@ NetworkStreamingModule::NetworkStreamingModule(const String &name, bool canHaveI
 		useLocal = sendCC->addBoolParameter("Local", "Send to Local IP (127.0.0.1). Allow to quickly switch between local and remote IP.", true);
 		remoteHost = sendCC->addStringParameter("Remote Host", "Remote Host to send to.", "127.0.0.1");
 		remoteHost->setEnabled(!useLocal->boolValue());
-		remotePort = sendCC->addIntParameter("Remote port", "Port on which the remote host is listening to", defaultRemotePort, 1, 65535);
+		remoteHost->autoTrim = true;
+		remotePort = sendCC->addIntParameter("Remote Port", "Port on which the remote host is listening to", defaultRemotePort, 1, 65535);
 
+		sendCC->warningResolveInspectable = this;
+		sendCC->showWarningInUI = true;
 		senderIsConnected = sendCC->addBoolParameter("Is Connected", "Will be active is sender is connected", false);
 		senderIsConnected->isControllableFeedbackOnly = true;
+	}
+
+	if (thruManager != nullptr)
+	{
+		moduleParams.controllableContainers.move(moduleParams.controllableContainers.indexOf(thruManager.get()), -1);
 	}
 }
 
@@ -56,17 +78,46 @@ NetworkStreamingModule::~NetworkStreamingModule()
 void NetworkStreamingModule::clearThread()
 {
 	signalThreadShouldExit();
-	while (isThreadRunning());
+	waitForThreadToExit(1000);
 }
 
-void NetworkStreamingModule::controllableFeedbackUpdate(ControllableContainer * cc, Controllable * c)
+void NetworkStreamingModule::onContainerParameterChangedInternal(Parameter* p)
+{
+	if (p == enabled)
+	{
+		if (!isCurrentlyLoadingData)
+		{
+			NLOG(niceName, "Module is " << (enabled->boolValue() ? "enabled" : "disabled") << ", " << (enabled->boolValue() ? "opening" : "closing") << " connections");
+			
+			setupSender();
+			setupReceiver();
+		}
+	}
+}
+
+void NetworkStreamingModule::controllableFeedbackUpdate(ControllableContainer* cc, Controllable* c)
 {
 	StreamingModule::onControllableFeedbackUpdateInternal(cc, c);
 	if (c == remoteHost || c == remotePort || c == useLocal)
 	{
 		if (c == useLocal) remoteHost->setEnabled(!useLocal->boolValue());
-		setupSender();
-	} else if (c == localPort) setupReceiver();
+		if(!isCurrentlyLoadingData) setupSender();
+	}
+	else if (c == localPort)
+	{
+		if (!isCurrentlyLoadingData) setupReceiver();
+	}
+	else if ((receiveCC != nullptr && c == receiveCC->enabled) || (sendCC != nullptr && c == sendCC->enabled))
+	{
+		setupIOConfiguration(receiveCC != nullptr?receiveCC->enabled->boolValue():false, sendCC != nullptr?sendCC->enabled->boolValue():false);
+	}
+}
+
+void NetworkStreamingModule::loadJSONDataInternal(var data)
+{
+	StreamingModule::loadJSONDataInternal(data);
+	setupSender();
+	setupReceiver();
 }
 
 void NetworkStreamingModule::run()
@@ -81,7 +132,7 @@ void NetworkStreamingModule::run()
 
 	while (!threadShouldExit())
 	{
-		sleep(10); //100 fps
+		sleep(1000 / receiveFrequency->intValue());
 
 		if (checkReceiverIsReady())
 		{
@@ -102,7 +153,7 @@ void NetworkStreamingModule::run()
 						stringBuffer.append(String::fromUTF8((char *)bytes.getRawDataPointer(), numBytes), numBytes);
 						StringArray sa;
 						sa.addTokens(stringBuffer, "\r\n", "\"");
-						for (int i = 0; i < sa.size() - 1; i++) if(sa[i].isNotEmpty()) processDataLine(sa[i]);
+						for (int i = 0; i < sa.size() - 1; i++) processDataLine(sa[i]);
 						stringBuffer = sa[sa.size() - 1];
 					}
 				}
@@ -143,7 +194,7 @@ void NetworkStreamingModule::run()
 						{
 							uint8_t decodedData[255];
 							size_t numDecoded = cobs_decode(byteBuffer.getRawDataPointer() , byteBuffer.size(), decodedData);
-							processDataBytes(Array<uint8>(decodedData,(int)numDecoded));
+							processDataBytes(Array<uint8>(decodedData, (int)numDecoded - 1));
 							byteBuffer.clear();
 						}
 					}
@@ -156,4 +207,6 @@ void NetworkStreamingModule::run()
 			}
 		}
 	}
+
+	DBG("Exit thread");
 }

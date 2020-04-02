@@ -14,13 +14,16 @@
 #include "commands/SendStreamValuesCommand.h"
 #include "commands/SendStreamStringValuesCommand.h"
 #include "UI/ChataigneAssetManager.h"
+#include "Common/Serial/lib/cobs/cobs.h"
+#include "Module/ModuleManager.h"
 
 StreamingModule::StreamingModule(const String & name) :
 	Module(name)
 {
 	includeValuesInSave = true;
 	setupIOConfiguration(true, true);
-	
+	canHandleRouteValues = hasOutput;
+
 	streamingType = moduleParams.addEnumParameter("Protocol", "Protocol for treating the incoming data");
 	streamingType->addOption("Lines", LINES)->addOption("Raw", RAW)->addOption("Data255", DATA255)->addOption("COBS", COBS);
 
@@ -29,18 +32,28 @@ StreamingModule::StreamingModule(const String & name) :
 	firstValueIsTheName = moduleParams.addBoolParameter("First value is the name", "If checked, the first value of a parsed message will be used to name the value, otherwise each values will be named by their index", true);
 	buildMessageStructureOptions();
 
-	defManager.add(CommandDefinition::createDef(this, "", "Send string", &SendStreamStringCommand::create, CommandContext::BOTH));
-	defManager.add(CommandDefinition::createDef(this, "", "Send values as string", &SendStreamStringValuesCommand::create, CommandContext::BOTH));
-	defManager.add(CommandDefinition::createDef(this, "", "Send raw bytes", &SendStreamRawDataCommand::create, CommandContext::BOTH));
-	defManager.add(CommandDefinition::createDef(this, "", "Send custom values", &SendStreamValuesCommand::create, CommandContext::BOTH)); 
+	defManager->add(CommandDefinition::createDef(this, "", "Send string", &SendStreamStringCommand::create, CommandContext::BOTH));
+	defManager->add(CommandDefinition::createDef(this, "", "Send values as string", &SendStreamStringValuesCommand::create, CommandContext::BOTH));
+	defManager->add(CommandDefinition::createDef(this, "", "Send raw bytes", &SendStreamRawDataCommand::create, CommandContext::BOTH));
+	defManager->add(CommandDefinition::createDef(this, "", "Send custom values", &SendStreamValuesCommand::create, CommandContext::BOTH));
+	defManager->add(CommandDefinition::createDef(this, "", "Send hex data", &SendStreamStringCommand::create, CommandContext::BOTH)->addParam("mode", SendStreamStringCommand::DataMode::HEX));
 	
 	scriptObject.setMethod(sendId, StreamingModule::sendStringFromScript);
 	scriptObject.setMethod(sendBytesId, StreamingModule::sendBytesFromScript);
 	
 	scriptManager->scriptTemplate += ChataigneAssetManager::getInstance()->getScriptTemplate("streaming");
 
+
 	valuesCC.userCanAddControllables = true;
 	valuesCC.customUserCreateControllableFunc = &StreamingModule::showMenuAndCreateValue;
+
+	if (hasInput)
+	{
+		thruManager.reset(new ControllableContainer("Pass-through"));
+		thruManager->userCanAddControllables = true;
+		thruManager->customUserCreateControllableFunc = &StreamingModule::createThruControllable;
+		moduleParams.addChildControllableContainer(thruManager.get());
+	}
 }
 
 StreamingModule::~StreamingModule()
@@ -67,7 +80,13 @@ void StreamingModule::buildMessageStructureOptions()
 	
 	case LINES:
 	{
-		messageStructure->addOption("Space separated", LINES_SPACE)->addOption("Tab separated", LINES_TAB)->addOption("Comma (,) separated", LINES_COMMA)->addOption("Equals (=) separated", LINES_EQUALS);
+		messageStructure->addOption("Space separated", LINES_SPACE)
+			->addOption("Tab separated", LINES_TAB)
+			->addOption("Comma (,) separated", LINES_COMMA)
+			->addOption("Colon (:) separated", LINES_COLON)
+			->addOption("Semicolon (;) separated", LINES_SEMICOLON)
+			->addOption("Equals (=) separated", LINES_EQUALS)
+			->addOption("No separation (will create only one parameter)", NO_SEPARATION);
 	}
 	break;
 	
@@ -81,12 +100,30 @@ void StreamingModule::buildMessageStructureOptions()
 	}
 }
 
-void StreamingModule::processDataLine(const String & message)
+void StreamingModule::processDataLine(const String & msg)
 {
 	if (!enabled->boolValue()) return;
-	if (logIncomingData->boolValue()) NLOG(niceName, "Message received : " + message);
-
+	if (logIncomingData->boolValue()) NLOG(niceName, "Message received : " << (msg.isNotEmpty() ? msg : "(Empty message)"));
 	inActivityTrigger->trigger();
+
+	if (thruManager != nullptr)
+	{
+		for (auto& c : thruManager->controllables)
+		{
+			if (TargetParameter* mt = (TargetParameter*)c)
+			{
+				if (!mt->enabled) continue;
+				if (StreamingModule * m = (StreamingModule*)(mt->targetContainer.get()))
+				{
+					m->sendMessage(msg+"\n"); //add newline as it has been removed when parsing
+				}
+			}
+		}
+	}
+
+
+	const String message = msg.removeCharacters("\r\n");
+	if (message.isEmpty()) return;
 
 	processDataLineInternal(message);
 	
@@ -101,10 +138,19 @@ void StreamingModule::processDataLine(const String & message)
 	case LINES_TAB:   separator = "\t"; break;
 	case LINES_COMMA: separator = ","; break;
 	case LINES_EQUALS: separator = "="; break;
+	case LINES_COLON: separator = ":"; break;
+	case LINES_SEMICOLON: separator = ";"; break;
     default:
         break;
 	}
-	valuesString.addTokens(message, separator, "\"");
+
+	if(s != NO_SEPARATION) valuesString.addTokens(message, separator, "\"");
+	else
+	{
+		if (firstValueIsTheName->boolValue()) valuesString.add("Value");
+		valuesString.add(message);
+	}
+
 	if (valuesString.size() == 0)
 	{
 		//LOG("No usable data");
@@ -115,18 +161,34 @@ void StreamingModule::processDataLine(const String & message)
 	{
 		String valueName = valuesString[0];
 		int numArgs = valuesString.size() - 1;
+		
 		Controllable * c = valuesCC.getControllableByName(valueName, true);
+
 		if (c == nullptr)
 		{
 			if (!autoAdd->boolValue()) return;
 
-			switch (numArgs)
+			if (numArgs > 0 && valuesString[1].getFloatValue() == 0 && !valuesString[1].containsChar('0'))
 			{
-			case 0: c = new Trigger(valueName, valueName); break;
-			case 1:	c = new FloatParameter(valueName, valueName, valuesString[1].getFloatValue()); break;
-			case 2: c = new Point2DParameter(valueName, valueName); ((Point2DParameter *)c)->setPoint(valuesString[1].getFloatValue(), valuesString[2].getFloatValue()); break;
-			case 3: c = new Point3DParameter(valueName, valueName); ((Point3DParameter *)c)->setVector(valuesString[1].getFloatValue(), valuesString[2].getFloatValue(), valuesString[3].getFloatValue()); break;
-			case 4: c = new ColorParameter(valueName, valueName, Colour::fromFloatRGBA(valuesString[1].getFloatValue(), valuesString[2].getFloatValue(), valuesString[3].getFloatValue(), valuesString[4].getFloatValue()));
+				valuesString.remove(0);
+				c = new StringParameter(valueName, valueName, valuesString.joinIntoString(" "));
+			}
+			else
+			{
+				switch (numArgs)
+				{
+				case 0: c = new Trigger(valueName, valueName); break;
+				case 1:	c = new FloatParameter(valueName, valueName, valuesString[1].getFloatValue()); break;
+				case 2: c = new Point2DParameter(valueName, valueName); ((Point2DParameter*)c)->setPoint(valuesString[1].getFloatValue(), valuesString[2].getFloatValue()); break;
+				case 3: c = new Point3DParameter(valueName, valueName); ((Point3DParameter*)c)->setVector(valuesString[1].getFloatValue(), valuesString[2].getFloatValue(), valuesString[3].getFloatValue()); break;
+				case 4: c = new ColorParameter(valueName, valueName, Colour::fromFloatRGBA(valuesString[1].getFloatValue(), valuesString[2].getFloatValue(), valuesString[3].getFloatValue(), valuesString[4].getFloatValue()));
+				default:
+				{
+					valuesString.remove(0);
+					c = new StringParameter(valueName, valueName, valuesString.joinIntoString(" "));
+				}
+
+				}
 			}
 
 			if (c != nullptr)
@@ -149,6 +211,10 @@ void StreamingModule::processDataLine(const String & message)
 				if (numArgs >= 1) ((FloatParameter *)c)->setValue(valuesString[1].getFloatValue());
 				break;
 
+			case Controllable::INT:
+				if (numArgs >= 1) ((IntParameter*)c)->setValue(valuesString[1].getIntValue());
+				break;
+
 			case Controllable::POINT2D:
 				if (numArgs >= 2) ((Point2DParameter *)c)->setPoint(valuesString[1].getFloatValue(), valuesString[2].getFloatValue());
 				break;
@@ -162,8 +228,11 @@ void StreamingModule::processDataLine(const String & message)
 				break;
                     
 			case Controllable::STRING:
-				if(numArgs >= 1) ((StringParameter *)c)->setValue(valuesString[1]);
-				break;
+			{
+				valuesString.remove(0);
+				if(numArgs >= 1) ((StringParameter *)c)->setValue(valuesString.joinIntoString(" "));
+			}
+			break;
 
             default:
                 break;
@@ -173,36 +242,51 @@ void StreamingModule::processDataLine(const String & message)
 		
 	} else
 	{
-		
 		int numArgs = valuesString.size();
-		int numValues = valuesCC.controllables.size();
-
-		if (autoAdd->boolValue())
-		{
-			while (numValues < numArgs)
-			{
-				FloatParameter * fp = new FloatParameter("Value " + String(numValues), "Value " + String(numValues), 0);
-				fp->isCustomizableByUser = true;
-				fp->isRemovableByUser = true;
-				fp->saveValueOnly = false;
-
-				valuesCC.addControllable(fp);
-
-				numValues = valuesCC.controllables.size();
-			}
-		}
 
 		for (int i = 0; i < numArgs; i++)
 		{
-			FloatParameter * c = dynamic_cast<FloatParameter *>(valuesCC.controllables[i]);
+			Controllable* c = valuesCC.getControllableByName("Value " + String(i), true);
+
+			if (c == nullptr)
+			{
+				if (autoAdd->boolValue())
+				{
+					if (valuesString[i].getFloatValue() == 0 && !valuesString[i].containsChar('0'))
+					{
+						c = new StringParameter("Value " + String(i), "Value " + String(i), "");
+					}
+					else
+					{
+						c = new FloatParameter("Value " + String(i), "Value " + String(i), 0);
+					}
+
+					if (c != nullptr)
+					{
+						c->isCustomizableByUser = true;
+						c->isRemovableByUser = true;
+						c->saveValueOnly = false;
+
+						valuesCC.addControllable(c);
+					}
+
+				}
+			}
+			
 			if (c != nullptr)
 			{
-				c->setValue(valuesString[i].getFloatValue());
+				switch (c->type)
+				{
+				case Controllable::FLOAT: ((FloatParameter*)c)->setValue(valuesString[i].getFloatValue()); break;
+				case Controllable::INT:((IntParameter*)c)->setValue(valuesString[i].getIntValue()); break;
+				case Controllable::STRING: ((StringParameter*)c)->setValue(valuesString[i]); break;
+				default:
+					((Parameter*)c)->setValue(valuesString[i].getFloatValue()); break;
+					break;
+				}
 			}
 		}
-
 	}
-
 }
 
 void StreamingModule::processDataBytes(Array<uint8_t> data)
@@ -216,6 +300,21 @@ void StreamingModule::processDataBytes(Array<uint8_t> data)
 	}
 
 	inActivityTrigger->trigger();
+
+	if (thruManager != nullptr)
+	{
+		for (auto& c : thruManager->controllables)
+		{
+			if (TargetParameter* mt = (TargetParameter*)c)
+			{
+				if (!mt->enabled) continue;
+				if (StreamingModule* m = (StreamingModule*)(mt->targetContainer.get()))
+				{
+					m->sendBytes(data);
+				}
+			}
+		}
+	}
 
 	processDataBytesInternal(data);
 
@@ -243,6 +342,7 @@ void StreamingModule::processDataBytes(Array<uint8_t> data)
 				p->isCustomizableByUser = true;
 				p->isRemovableByUser = true;
 				p->saveValueOnly = false;
+				p->hexMode = true;
 				valuesCC.addControllable(p);
 				numValues = valuesCC.controllables.size();
 			}
@@ -329,27 +429,56 @@ void StreamingModule::processDataBytes(Array<uint8_t> data)
 	
 }
 
-void StreamingModule::sendMessage(const String & message)
+void StreamingModule::sendMessage(const String & message, var params)
 {
-	if (!enabled->boolValue() || !isReadyToSend()) return;
-	sendMessageInternal(message);
+	if (!enabled->boolValue()) return;
+	if(!isReadyToSend())
+	{
+		if (logOutgoingData->boolValue()) NLOGWARNING(niceName, "Can't send message, output is not connected");
+		return;
+	}
+	
+	sendMessageInternal(message, params);
 	outActivityTrigger->trigger();
+	
 	if (logOutgoingData->boolValue()) NLOG(niceName, "Sending : " << message);
 }
 
-void StreamingModule::sendBytes(Array<uint8> bytes)
+void StreamingModule::sendBytes(Array<uint8> bytes, var params)
 {
-	if (!enabled->boolValue() || !isReadyToSend()) return;
+	if (!enabled->boolValue()) return;
+	if(!isReadyToSend())
+	{
+		if (logOutgoingData->boolValue()) NLOGWARNING(niceName, "Can't send  data, output is not connected.");
+		return;
+	}
 
 	if (streamingType->getValueDataAsEnum<StreamingType>() == COBS)
 	{
-		Array<uint8> sourceBytes = Array<uint8>(bytes);
-		cobs_encode(sourceBytes.getRawDataPointer(), bytes.size(), bytes.getRawDataPointer());
+		if (bytes.size() > 255)
+		{
+			NLOGWARNING(niceName, "Packet length cannot be more than 255 bytes with COBS encoding");
+			return;
+		}
+
+		int numBytes = bytes.size();
+		uint8_t data[255];
+		cobs_encode(bytes.getRawDataPointer(), numBytes , data);
+		bytes.clear();
+
+		for (int i = 0; i < numBytes+1;i++) bytes.add(data[i]);
+		bytes.add(0);
 	}
 
-	sendBytesInternal(bytes);
+	sendBytesInternal(bytes, params);
 	outActivityTrigger->trigger();
-	if (logOutgoingData->boolValue()) NLOG(niceName, "Sending " + String(bytes.size()) + " bytes");
+
+	if (logOutgoingData->boolValue())
+	{
+		String s = "Sending " + String(bytes.size()) + " bytes :";
+		for (auto& b : bytes) s += "\n0x" + String::toHexString(b);
+		NLOG(niceName, s);
+	}
 }
 
 void StreamingModule::showMenuAndCreateValue(ControllableContainer * container)
@@ -379,6 +508,17 @@ void StreamingModule::showMenuAndCreateValue(ControllableContainer * container)
 	}
 }
 
+void StreamingModule::createThruControllable(ControllableContainer* cc)
+{
+	TargetParameter* p = new TargetParameter("Output module", "Target module to send the raw data to", "");
+	p->targetType = TargetParameter::CONTAINER;
+	p->customGetTargetContainerFunc = &ModuleManager::showAndGetModuleOfType<StreamingModule>;
+	p->isRemovableByUser = true;
+	p->canBeDisabledByUser = true;
+	p->saveValueOnly = false;
+	cc->addParameter(p);
+}
+
 void StreamingModule::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
 {
 	Module::onControllableFeedbackUpdateInternal(cc, c);
@@ -392,26 +532,65 @@ void StreamingModule::onControllableFeedbackUpdateInternal(ControllableContainer
 
 	if (c == streamingType)
 	{
-		while (valuesCC.controllables.size() > 0) valuesCC.removeControllable(valuesCC.controllables[0]);
 		buildMessageStructureOptions();
-	} else if (c == messageStructure)
+	} 
+}
+
+void StreamingModule::loadJSONDataInternal(var data)
+{
+	Module::loadJSONDataInternal(data);
+	for (auto& v : valuesCC.controllables) v->isCustomizableByUser = true;
+
+	if (thruManager != nullptr)
 	{
-		while (valuesCC.controllables.size() > 0) valuesCC.removeControllable(valuesCC.controllables[0]);
+		//thruManager->loadJSONData(data.getProperty("thru", var()));
+		for (auto& c : thruManager->controllables)
+		{
+			if (TargetParameter* mt = dynamic_cast<TargetParameter*>(c))
+			{
+				mt->targetType = TargetParameter::CONTAINER;
+				mt->customGetTargetContainerFunc = &ModuleManager::showAndGetModuleOfType<StreamingModule>;
+				mt->isRemovableByUser = true;
+				mt->canBeDisabledByUser = true;
+			}
+		}
 	}
 }
 
 var StreamingModule::sendStringFromScript(const var::NativeFunctionArgs & a)
 {
 	StreamingModule * m = getObjectFromJS<StreamingModule>(a);
-	if (a.numArguments == 0) return var();
-	m->sendMessage(a.arguments[0].toString());
+	if (!checkNumArgs(m->niceName, a, 1)) return false;
+
+	if (a.arguments[0].isObject()) m->sendMessage(JSON::toString(a.arguments[0]));
+	else
+	{
+		String s = "";
+		for (int i = 0; i < a.numArguments; i++)
+		{
+			if (a.arguments[i].isArray() && a.arguments[i].size() > 0)
+			{
+				for (int j = 0; j < a.arguments[i].size(); j++)
+				{
+					s += (s.isNotEmpty() ? " " : "") + a.arguments[i][j].toString();
+				}
+			}
+			else
+			{
+				s += (s.isNotEmpty() ? " " : "") + a.arguments[i].toString();
+			}
+		}
+
+		m->sendMessage(s);
+	}
 	return var();
 }
 
 var StreamingModule::sendBytesFromScript(const var::NativeFunctionArgs & a)
 {
 	StreamingModule * m = getObjectFromJS<StreamingModule>(a);
-	if (a.numArguments == 0) return var();
+	DBG(a.numArguments);
+	if (!checkNumArgs(m->niceName, a, 1)) return false;
 	Array<uint8> data;
 	for (int i = 0; i < a.numArguments; i++)
 	{
@@ -419,7 +598,7 @@ var StreamingModule::sendBytesFromScript(const var::NativeFunctionArgs & a)
 		{
 			Array<var> * aa = a.arguments[i].getArray();
 			for (auto &vaa : *aa) data.add((uint8)(int)vaa);
-		} else if (a.arguments[i].isInt() || a.arguments[i].isDouble())
+		} else if (a.arguments[i].isInt() || a.arguments[i].isDouble() || a.arguments[i].isInt64() || a.arguments[i].isBool())
 		{
 			data.add((uint8)(int)a.arguments[i]);
 		}
@@ -427,4 +606,28 @@ var StreamingModule::sendBytesFromScript(const var::NativeFunctionArgs & a)
 
 	m->sendBytes(data);
 	return var();
+}
+
+StreamingModule::StreamingRouteParams::StreamingRouteParams(Module* sourceModule, Controllable* c)
+{
+	prefix = addStringParameter("Prefix", "Prefix to put before the actual value", c->shortName+" ");
+	appendNL = addBoolParameter("NL", "Append NL (New Line) at the end", false);
+	appendCR = addBoolParameter("CR", "Append CR (Charriot Return) at the end", false);
+}
+
+
+void StreamingModule::handleRoutedModuleValue(Controllable* c, RouteParams* p)
+{
+	StreamingRouteParams* op = dynamic_cast<StreamingRouteParams*>(p);
+	
+	String s = op->prefix->stringValue();
+	if (c->type != Controllable::TRIGGER)
+	{
+		s += dynamic_cast<Parameter*>(c)->stringValue();
+	}
+
+	s += op->appendCR->boolValue() ? "\r" : "";
+	s += op->appendNL->boolValue() ? "\n" : "";
+
+	sendMessage(s);
 }

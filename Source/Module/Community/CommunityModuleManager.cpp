@@ -25,12 +25,12 @@ CommunityModuleManager::CommunityModuleManager() :
 
 CommunityModuleManager::~CommunityModuleManager()
 {
-	waitForThreadToExit(2000);
+	waitForThreadToExit(4000);
 }
 
 void CommunityModuleManager::run()
 {
-	sleep(1000);
+	sleep(500);
 	var data = getJSONDataForURL(URL("http://benjamin.kuperberg.fr/chataigne/releases/modules.json"));
 	
 	if (!data.isObject())

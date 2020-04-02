@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="QZW0Vv" name="Chataigne" projectType="guiapp" version="1.6.1"
+<JUCERPROJECT id="QZW0Vv" name="Chataigne" projectType="guiapp" version="1.7.0b9"
               bundleIdentifier="benkuper.Chataigne" includeBinaryInAppConfig="1"
-              jucerVersion="5.4.3" companyName="Ben Kuper" companyWebsite="http://benjamin.kuperberg.fr"
+              jucerVersion="5.4.7" companyName="Ben Kuper" companyWebsite="http://benjamin.kuperberg.fr"
               companyEmail="benjamin@kuperberg.fr" defines="" splashScreenColour="Dark"
-              cppLanguageStandard="14" companyCopyright="Ben Kuper" headerPath="../../Source">
+              cppLanguageStandard="17" companyCopyright="Ben Kuper" headerPath="../../Source">
   <MAINGROUP id="EDDVhd" name="Chataigne">
     <GROUP id="{E61F6705-4C4B-3F04-F742-20CC91F590E4}" name="Resources">
+      <GROUP id="{400148EF-B215-CD72-18E1-183E2FCE16F3}" name="Modules">
+        <FILE id="MPJkAm" name="DLight.png" compile="0" resource="1" file="Resources/Modules/DLight.png"/>
+        <FILE id="kdkONp" name="DMX.png" compile="0" resource="1" file="Resources/Modules/DMX.png"/>
+        <FILE id="yfJH3x" name="Gamepad.png" compile="0" resource="1" file="Resources/Modules/Gamepad.png"/>
+        <FILE id="I0DSTK" name="HeavyM.png" compile="0" resource="1" file="Resources/Modules/HeavyM.png"/>
+        <FILE id="OrCxSg" name="HTTP.png" compile="0" resource="1" file="Resources/Modules/HTTP.png"/>
+        <FILE id="jWmnHY" name="JoyCon.png" compile="0" resource="1" file="Resources/Modules/JoyCon.png"/>
+        <FILE id="c0VYrw" name="Joystick.png" compile="0" resource="1" file="Resources/Modules/Joystick.png"/>
+        <FILE id="lCZ3px" name="Keyboard.png" compile="0" resource="1" file="Resources/Modules/Keyboard.png"/>
+        <FILE id="E3etXD" name="KinectV2.png" compile="0" resource="1" file="Resources/Modules/KinectV2.png"/>
+        <FILE id="k0DW1I" name="LiveOSC2.png" compile="0" resource="1" file="Resources/Modules/LiveOSC2.png"/>
+        <FILE id="XESC79" name="MadMapper.png" compile="0" resource="1" file="Resources/Modules/MadMapper.png"/>
+        <FILE id="Cwbr53" name="Metronome.png" compile="0" resource="1" file="Resources/Modules/Metronome.png"/>
+        <FILE id="rV6E05" name="MIDI.png" compile="0" resource="1" file="Resources/Modules/MIDI.png"/>
+        <FILE id="XUwKVr" name="Millumin.png" compile="0" resource="1" file="Resources/Modules/Millumin.png"/>
+        <FILE id="UjV2cF" name="Mouse.png" compile="0" resource="1" file="Resources/Modules/Mouse.png"/>
+        <FILE id="i5QUZ4" name="OS.png" compile="0" resource="1" file="Resources/Modules/OS.png"/>
+        <FILE id="CBoeF1" name="OSC.png" compile="0" resource="1" file="Resources/Modules/OSC.png"/>
+        <FILE id="mQRViU" name="OSCQuery.png" compile="0" resource="1" file="Resources/Modules/OSCQuery.png"/>
+        <FILE id="hswQuk" name="PJLink.png" compile="0" resource="1" file="Resources/Modules/PJLink.png"/>
+        <FILE id="Hlm2j3" name="PowerPoint.png" compile="0" resource="1" file="Resources/Modules/PowerPoint.png"/>
+        <FILE id="ccXjD9" name="Reaper.png" compile="0" resource="1" file="Resources/Modules/Reaper.png"/>
+        <FILE id="E4CDyf" name="Resolume.png" compile="0" resource="1" file="Resources/Modules/Resolume.png"/>
+        <FILE id="FUQUfm" name="Serial.png" compile="0" resource="1" file="Resources/Modules/Serial.png"/>
+        <FILE id="Pjs5Ut" name="Signal.png" compile="0" resource="1" file="Resources/Modules/Signal.png"/>
+        <FILE id="Pa5iXe" name="Sound Card.png" compile="0" resource="1" file="Resources/Modules/Sound Card.png"/>
+        <FILE id="CNldkC" name="Stream Deck.png" compile="0" resource="1" file="Resources/Modules/Stream Deck.png"/>
+        <FILE id="VUSpt3" name="TCP Client.png" compile="0" resource="1" file="Resources/Modules/TCP Client.png"/>
+        <FILE id="JHC4oG" name="TCP Server.png" compile="0" resource="1" file="Resources/Modules/TCP Server.png"/>
+        <FILE id="WCdCQ8" name="Time.png" compile="0" resource="1" file="Resources/Modules/Time.png"/>
+        <FILE id="Yc4byM" name="UDP.png" compile="0" resource="1" file="Resources/Modules/UDP.png"/>
+        <FILE id="cODnxv" name="Watchout.png" compile="0" resource="1" file="Resources/Modules/Watchout.png"/>
+        <FILE id="gSXz9z" name="Wiimote.png" compile="0" resource="1" file="Resources/Modules/Wiimote.png"/>
+      </GROUP>
       <GROUP id="{2B6637A1-A2F4-FF34-9B3E-D1D7E87E01F8}" name="Templates">
         <GROUP id="{053D51A3-B6CA-559C-CCC3-779F67848D87}" name="Scripts">
           <FILE id="MCfjDX" name="commandScriptTemplate.js" compile="0" resource="1"
@@ -32,6 +66,7 @@
       <FILE id="qDQaKu" name="about.png" compile="0" resource="1" file="Resources/about.png"/>
       <FILE id="fwyowN" name="add.png" compile="0" resource="1" file="Resources/add.png"/>
       <FILE id="KbrKp0" name="connected.png" compile="0" resource="1" file="Resources/connected.png"/>
+      <FILE id="LPTrA1" name="crash.png" compile="0" resource="1" file="Resources/crash.png"/>
       <FILE id="gZcS0r" name="default.chalayout" compile="0" resource="1"
             file="Resources/default.chalayout"/>
       <FILE id="kXP3Ci" name="disconnected.png" compile="0" resource="1"
@@ -47,6 +82,7 @@
       <FILE id="kly3dv" name="snap.png" compile="0" resource="1" file="Resources/snap.png"/>
       <FILE id="Umk8sJ" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>
       <FILE id="tF7PTq" name="stripe.png" compile="0" resource="1" file="Resources/stripe.png"/>
+      <FILE id="xbqvN3" name="tray_icon.png" compile="0" resource="1" file="Resources/tray_icon.png"/>
     </GROUP>
     <GROUP id="{31908E9E-F626-E2D6-1A6D-E188C9D72C25}" name="Source">
       <GROUP id="{F784235F-A65F-E1E7-A5F1-8414A8D681B3}" name="Guider">
@@ -64,12 +100,10 @@
         <FILE id="djiZVX" name="Guider.h" compile="0" resource="0" file="Source/Guider/Guider.h"/>
       </GROUP>
       <GROUP id="{C6C9402E-3E5F-DA24-8E22-DE4CD0AB4FD4}" name="Analytics">
-        <FILE id="WpUsgL" name="GoogleAnalyticsDestination.h" compile="0" resource="0"
-              file="Source/Analytics/GoogleAnalyticsDestination.h"/>
-        <FILE id="in1fwI" name="MatamoAnalytics.cpp" compile="1" resource="0"
-              file="Source/Analytics/MatamoAnalytics.cpp"/>
-        <FILE id="GNrv6Z" name="MatamoAnalytics.h" compile="0" resource="0"
-              file="Source/Analytics/MatamoAnalytics.h"/>
+        <FILE id="in1fwI" name="MatomoAnalytics.cpp" compile="1" resource="0"
+              file="Source/Analytics/MatomoAnalytics.cpp"/>
+        <FILE id="GNrv6Z" name="MatomoAnalytics.h" compile="0" resource="0"
+              file="Source/Analytics/MatomoAnalytics.h"/>
       </GROUP>
       <GROUP id="{6C7DFFF7-D47E-97B5-FE74-27F24C7A349F}" name="Common">
         <GROUP id="{1B487EA1-C305-46F0-D55D-17FDE1399960}" name="Zeroconf">
@@ -177,25 +211,8 @@
             <FILE id="BQnYUa" name="DMXSerialDevice.h" compile="0" resource="0"
                   file="Source/Common/DMX/device/DMXSerialDevice.h"/>
           </GROUP>
-          <GROUP id="{708645ED-3AA3-AFCD-7298-82FFDF295F14}" name="ui">
-            <FILE id="dnYLdT" name="DMXDashboard.cpp" compile="1" resource="0"
-                  file="Source/Common/DMX/ui/DMXDashboard.cpp"/>
-            <FILE id="wrBXDu" name="DMXDashboard.h" compile="0" resource="0" file="Source/Common/DMX/ui/DMXDashboard.h"/>
-            <FILE id="WXmlo0" name="DMXStateManagerUI.cpp" compile="1" resource="0"
-                  file="Source/Common/DMX/ui/DMXStateManagerUI.cpp"/>
-            <FILE id="ng0NQQ" name="DMXStateManagerUI.h" compile="0" resource="0"
-                  file="Source/Common/DMX/ui/DMXStateManagerUI.h"/>
-            <FILE id="J1MZzM" name="DMXStateUI.cpp" compile="1" resource="0" file="Source/Common/DMX/ui/DMXStateUI.cpp"/>
-            <FILE id="pzd19w" name="DMXStateUI.h" compile="0" resource="0" file="Source/Common/DMX/ui/DMXStateUI.h"/>
-          </GROUP>
           <FILE id="qcXTQm" name="DMXManager.cpp" compile="1" resource="0" file="Source/Common/DMX/DMXManager.cpp"/>
           <FILE id="OIayX5" name="DMXManager.h" compile="0" resource="0" file="Source/Common/DMX/DMXManager.h"/>
-          <FILE id="UCF7gK" name="DMXState.cpp" compile="1" resource="0" file="Source/Common/DMX/DMXState.cpp"/>
-          <FILE id="iTjeeg" name="DMXState.h" compile="0" resource="0" file="Source/Common/DMX/DMXState.h"/>
-          <FILE id="zz4bk7" name="DMXStateManager.cpp" compile="1" resource="0"
-                file="Source/Common/DMX/DMXStateManager.cpp"/>
-          <FILE id="phHvGn" name="DMXStateManager.h" compile="0" resource="0"
-                file="Source/Common/DMX/DMXStateManager.h"/>
         </GROUP>
         <GROUP id="{00DB7CFA-CACA-0D02-4E20-E907A0900C31}" name="MIDI">
           <GROUP id="{6A517320-E014-4F0A-1B7F-E6E464B84224}" name="ui">
@@ -216,13 +233,10 @@
                 file="Source/Common/MIDI/MIDIDeviceParameter.h"/>
           <FILE id="yx6DYy" name="MIDIManager.cpp" compile="1" resource="0" file="Source/Common/MIDI/MIDIManager.cpp"/>
           <FILE id="rVJbQL" name="MIDIManager.h" compile="0" resource="0" file="Source/Common/MIDI/MIDIManager.h"/>
+          <FILE id="uBbjBk" name="MTCReceiver.cpp" compile="1" resource="0" file="Source/Common/MIDI/MTCReceiver.cpp"/>
+          <FILE id="zIscrU" name="MTCReceiver.h" compile="0" resource="0" file="Source/Common/MIDI/MTCReceiver.h"/>
           <FILE id="lLH5id" name="MTCSender.cpp" compile="1" resource="0" file="Source/Common/MIDI/MTCSender.cpp"/>
           <FILE id="Y5NAoh" name="MTCSender.h" compile="0" resource="0" file="Source/Common/MIDI/MTCSender.h"/>
-        </GROUP>
-        <GROUP id="{70631E35-1CB6-82B1-0572-78D8D2F56250}" name="Plugin">
-          <FILE id="JHMfXN" name="PluginManager.cpp" compile="1" resource="0"
-                file="Source/Common/Plugin/PluginManager.cpp"/>
-          <FILE id="ZqY81o" name="PluginManager.h" compile="0" resource="0" file="Source/Common/Plugin/PluginManager.h"/>
         </GROUP>
         <GROUP id="{54EAB5D0-4FF9-8475-F580-32A4B6B32B16}" name="Processor">
           <GROUP id="{797800DA-0DCB-1B89-AF24-83A7716BB83C}" name="Action">
@@ -374,10 +388,52 @@
                         file="Source/Common/Processor/Mapping/Filter/filters/number/SimpleSmoothFilter.h"/>
                 </GROUP>
                 <GROUP id="{B7FF85C8-5933-B0A6-01EB-956029CA3808}" name="conversion">
-                  <FILE id="SZe1T3" name="ConversionFilters.cpp" compile="1" resource="0"
-                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionFilters.cpp"/>
-                  <FILE id="Labzbe" name="ConversionFilters.h" compile="0" resource="0"
-                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionFilters.h"/>
+                  <FILE id="w9wUtl" name="ConversionParamValueLink.cpp" compile="1" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionParamValueLink.cpp"/>
+                  <FILE id="zPkcSd" name="ConversionParamValueLink.h" compile="0" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionParamValueLink.h"/>
+                  <GROUP id="{6B530411-961A-9C18-896A-B66575488292}" name="ui">
+                    <FILE id="W57rAV" name="ConversionConnector.cpp" compile="1" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionConnector.cpp"/>
+                    <FILE id="KdAm8w" name="ConversionConnector.h" compile="0" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionConnector.h"/>
+                    <FILE id="Bwd5rQ" name="ConversionFilterEditor.cpp" compile="1" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionFilterEditor.cpp"/>
+                    <FILE id="o6YOhn" name="ConversionFilterEditor.h" compile="0" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionFilterEditor.h"/>
+                    <FILE id="meZfAw" name="ConversionParamValueLinkUI.cpp" compile="1"
+                          resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionParamValueLinkUI.cpp"/>
+                    <FILE id="Na5r3Z" name="ConversionParamValueLinkUI.h" compile="0" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionParamValueLinkUI.h"/>
+                    <FILE id="iH0MO8" name="ConversionSourceParameterUI.cpp" compile="1"
+                          resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionSourceParameterUI.cpp"/>
+                    <FILE id="KbPQYt" name="ConversionSourceParameterUI.h" compile="0"
+                          resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConversionSourceParameterUI.h"/>
+                    <FILE id="E0jy9V" name="ConvertedParameterManagerEditor.cpp" compile="1"
+                          resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConvertedParameterManagerEditor.cpp"/>
+                    <FILE id="P5kWCb" name="ConvertedParameterManagerEditor.h" compile="0"
+                          resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConvertedParameterManagerEditor.h"/>
+                    <FILE id="wFqFBd" name="ConvertedParameterEditor.cpp" compile="1" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConvertedParameterEditor.cpp"/>
+                    <FILE id="ZvPsh2" name="ConvertedParameterEditor.h" compile="0" resource="0"
+                          file="Source/Common/Processor/Mapping/Filter/filters/conversion/ui/ConvertedParameterEditor.h"/>
+                  </GROUP>
+                  <FILE id="yfRGUU" name="ConversionFilter.cpp" compile="1" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionFilter.cpp"/>
+                  <FILE id="LdTp5f" name="ConversionFilter.h" compile="0" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConversionFilter.h"/>
+                  <FILE id="SZe1T3" name="SimpleConversionFilters.cpp" compile="1" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/SimpleConversionFilters.cpp"/>
+                  <FILE id="Labzbe" name="SimpleConversionFilters.h" compile="0" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/SimpleConversionFilters.h"/>
+                  <FILE id="Z0hXDn" name="ConvertedParameter.cpp" compile="1" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConvertedParameter.cpp"/>
+                  <FILE id="GdUkck" name="ConvertedParameter.h" compile="0" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConvertedParameter.h"/>
+                  <FILE id="nMZCD8" name="ConvertedParameterManager.cpp" compile="1"
+                        resource="0" file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConvertedParameterManager.cpp"/>
+                  <FILE id="KQtlli" name="ConvertedParameterManager.h" compile="0" resource="0"
+                        file="Source/Common/Processor/Mapping/Filter/filters/conversion/ConvertedParameterManager.h"/>
                 </GROUP>
                 <GROUP id="{DFEE3DF8-8874-CD04-277C-C8DED50DEBEA}" name="color">
                   <FILE id="eqC8n5" name="ColorShiftFilter.cpp" compile="1" resource="0"
@@ -400,6 +456,10 @@
               <FILE id="VVDXZi" name="MappingInput.cpp" compile="1" resource="0"
                     file="Source/Common/Processor/Mapping/Input/MappingInput.cpp"/>
               <FILE id="LBLQTv" name="MappingInput.h" compile="0" resource="0" file="Source/Common/Processor/Mapping/Input/MappingInput.h"/>
+              <FILE id="yHiHYe" name="MappingInputManager.cpp" compile="1" resource="0"
+                    file="Source/Common/Processor/Mapping/Input/MappingInputManager.cpp"/>
+              <FILE id="RoPMB6" name="MappingInputManager.h" compile="0" resource="0"
+                    file="Source/Common/Processor/Mapping/Input/MappingInputManager.h"/>
             </GROUP>
             <GROUP id="{18518876-74C1-2B25-1A4A-02F7AB24FFB8}" name="Output">
               <GROUP id="{5C583B99-90CB-DA96-EC0A-625FC344B9E5}" name="ui">
@@ -474,6 +534,25 @@
       </GROUP>
       <GROUP id="{B7AE4CF6-C109-933F-DE7E-494B9C9E3C1A}" name="CustomVariables">
         <GROUP id="{5F538722-534C-6E5F-A390-C27908706068}" name="Preset">
+          <GROUP id="{7C4600DA-EA87-31A9-C169-F36E4160C336}" name="Morpher">
+            <GROUP id="{32C80DA9-7285-3DA9-4A81-1CFC8EC1FF47}" name="ui">
+              <FILE id="odSdpx" name="CVPresetMorphUI.cpp" compile="1" resource="0"
+                    file="Source/CustomVariables/Preset/Morpher/ui/CVPresetMorphUI.cpp"/>
+              <FILE id="TxHh4R" name="CVPresetMorphUI.h" compile="0" resource="0"
+                    file="Source/CustomVariables/Preset/Morpher/ui/CVPresetMorphUI.h"/>
+              <FILE id="PiOMeC" name="MorpherViewUI.cpp" compile="1" resource="0"
+                    file="Source/CustomVariables/Preset/Morpher/ui/MorpherViewUI.cpp"/>
+              <FILE id="FcwzkW" name="MorpherViewUI.h" compile="0" resource="0" file="Source/CustomVariables/Preset/Morpher/ui/MorpherViewUI.h"/>
+              <FILE id="F5RFMR" name="MorphTargetUI.cpp" compile="1" resource="0"
+                    file="Source/CustomVariables/Preset/Morpher/ui/MorphTargetUI.cpp"/>
+              <FILE id="HrQEd2" name="MorphTargetUI.h" compile="0" resource="0" file="Source/CustomVariables/Preset/Morpher/ui/MorphTargetUI.h"/>
+            </GROUP>
+            <FILE id="dIobVB" name="jc_voronoi.h" compile="0" resource="0" file="Source/CustomVariables/Preset/Morpher/jc_voronoi.h"/>
+            <FILE id="Z1ifun" name="Morpher.cpp" compile="1" resource="0" file="Source/CustomVariables/Preset/Morpher/Morpher.cpp"/>
+            <FILE id="tQysma" name="Morpher.h" compile="0" resource="0" file="Source/CustomVariables/Preset/Morpher/Morpher.h"/>
+            <FILE id="NN9a7f" name="MorphTarget.cpp" compile="1" resource="0" file="Source/CustomVariables/Preset/Morpher/MorphTarget.cpp"/>
+            <FILE id="MXiseT" name="MorphTarget.h" compile="0" resource="0" file="Source/CustomVariables/Preset/Morpher/MorphTarget.h"/>
+          </GROUP>
           <GROUP id="{CBA24D1A-B1C0-255E-3003-E37986E099CE}" name="ui">
             <FILE id="yGVOVX" name="CVPresetEditor.cpp" compile="1" resource="0"
                   file="Source/CustomVariables/Preset/ui/CVPresetEditor.cpp"/>
@@ -573,6 +652,12 @@
           </GROUP>
           <GROUP id="{01EC461B-4BC5-C8F7-D379-477B101B8032}" name="common">
             <GROUP id="{FAB3DA65-9EC2-9C28-3056-B0C9309EFBEE}" name="commands">
+              <GROUP id="{D2E06C78-3A38-5C4B-026F-DE4BEE83F13E}" name="scriptcallback">
+                <FILE id="kJSyrI" name="ScriptCallbackCommand.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/common/commands/scriptcallback/ScriptCallbackCommand.cpp"/>
+                <FILE id="EPqsRa" name="ScriptCallbackCommand.h" compile="0" resource="0"
+                      file="Source/Module/modules/common/commands/scriptcallback/ScriptCallbackCommand.h"/>
+              </GROUP>
               <GROUP id="{B061FF30-9D17-6208-8F0E-14FF411E0ACD}" name="scriptcommands">
                 <GROUP id="{93968D0B-6B90-7857-AA1F-30385F5B26FE}" name="ui">
                   <FILE id="YM9AVa" name="MappableParameterEditor.cpp" compile="1" resource="0"
@@ -649,6 +734,51 @@
             </GROUP>
           </GROUP>
           <GROUP id="{A597C064-C7DE-23AD-F74A-2E029F90FCEA}" name="controller">
+            <GROUP id="{188E8CA2-04CC-D878-F91F-A3EDE5E6A665}" name="mouse">
+              <GROUP id="{76214040-3E5D-6DDE-134B-66DC1FAC3DDD}" name="commands">
+                <FILE id="qKD2RO" name="MouseModuleCommands.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/mouse/commands/MouseModuleCommands.cpp"/>
+                <FILE id="LceN6H" name="MouseModuleCommands.h" compile="0" resource="0"
+                      file="Source/Module/modules/controller/mouse/commands/MouseModuleCommands.h"/>
+              </GROUP>
+              <FILE id="fsxmhm" name="MouseMacFunctions.h" compile="0" resource="0"
+                    file="Source/Module/modules/controller/mouse/MouseMacFunctions.h"/>
+              <FILE id="YSaYns" name="MouseModule.cpp" compile="1" resource="0" file="Source/Module/modules/controller/mouse/MouseModule.cpp"/>
+              <FILE id="pM3zML" name="MouseModule.h" compile="0" resource="0" file="Source/Module/modules/controller/mouse/MouseModule.h"/>
+            </GROUP>
+            <GROUP id="{8F6890F4-73F1-C709-3041-54E6E08838F1}" name="streamdeck">
+              <GROUP id="{5846E3A2-6CB1-A070-1811-E4E3C52C814C}" name="models">
+                <FILE id="lChxs5" name="StreamDeckMini.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/models/StreamDeckMini.cpp"/>
+                <FILE id="VxMi3I" name="StreamDeckMini.h" compile="0" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/models/StreamDeckMini.h"/>
+                <FILE id="tnjUQM" name="StreamDeckV1.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/models/StreamDeckV1.cpp"/>
+                <FILE id="OimxR1" name="StreamDeckV1.h" compile="0" resource="0" file="Source/Module/modules/controller/streamdeck/models/StreamDeckV1.h"/>
+                <FILE id="JWHOlg" name="StreamDeckV2.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/models/StreamDeckV2.cpp"/>
+                <FILE id="HsPC1y" name="StreamDeckV2.h" compile="0" resource="0" file="Source/Module/modules/controller/streamdeck/models/StreamDeckV2.h"/>
+                <FILE id="sW7OAf" name="StreamDeckXL.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/models/StreamDeckXL.cpp"/>
+                <FILE id="yEI2V5" name="StreamDeckXL.h" compile="0" resource="0" file="Source/Module/modules/controller/streamdeck/models/StreamDeckXL.h"/>
+              </GROUP>
+              <GROUP id="{913B8A45-77B5-B711-04D5-75EC35D70E4C}" name="commands">
+                <FILE id="iVwQ3o" name="StreamDeckCommand.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/commands/StreamDeckCommand.cpp"/>
+                <FILE id="w8vTKb" name="StreamDeckCommand.h" compile="0" resource="0"
+                      file="Source/Module/modules/controller/streamdeck/commands/StreamDeckCommand.h"/>
+              </GROUP>
+              <FILE id="d5RAM9" name="StreamDeck.cpp" compile="1" resource="0" file="Source/Module/modules/controller/streamdeck/StreamDeck.cpp"/>
+              <FILE id="XnBZLE" name="StreamDeck.h" compile="0" resource="0" file="Source/Module/modules/controller/streamdeck/StreamDeck.h"/>
+              <FILE id="UgZLTU" name="StreamDeckManager.cpp" compile="1" resource="0"
+                    file="Source/Module/modules/controller/streamdeck/StreamDeckManager.cpp"/>
+              <FILE id="RTRxqS" name="StreamDeckManager.h" compile="0" resource="0"
+                    file="Source/Module/modules/controller/streamdeck/StreamDeckManager.h"/>
+              <FILE id="RWJ5Wj" name="StreamDeckModule.cpp" compile="1" resource="0"
+                    file="Source/Module/modules/controller/streamdeck/StreamDeckModule.cpp"/>
+              <FILE id="MRe3Zu" name="StreamDeckModule.h" compile="0" resource="0"
+                    file="Source/Module/modules/controller/streamdeck/StreamDeckModule.h"/>
+            </GROUP>
             <GROUP id="{1D8065A9-6361-47B1-8256-D348748068B3}" name="joystick">
               <FILE id="LydpTA" name="JoystickModule.cpp" compile="1" resource="0"
                     file="Source/Module/modules/controller/joystick/JoystickModule.cpp"/>
@@ -666,6 +796,14 @@
               <FILE id="G3w16g" name="JoyConModule.h" compile="0" resource="0" file="Source/Module/modules/controller/joycon/JoyConModule.h"/>
             </GROUP>
             <GROUP id="{DD0E5C56-EE3B-3CF9-A333-D5778991DBAE}" name="keyboard">
+              <GROUP id="{860517DB-8700-72CA-E905-B3BC181BC7E1}" name="commands">
+                <FILE id="mJHtL3" name="KeyboardModuleCommands.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/controller/keyboard/commands/KeyboardModuleCommands.cpp"/>
+                <FILE id="kfQ62u" name="KeyboardModuleCommands.h" compile="0" resource="0"
+                      file="Source/Module/modules/controller/keyboard/commands/KeyboardModuleCommands.h"/>
+              </GROUP>
+              <FILE id="HIGkaL" name="KeyboardMacFunctions.h" compile="0" resource="0"
+                    file="Source/Module/modules/controller/keyboard/KeyboardMacFunctions.h"/>
               <FILE id="nudXpb" name="KeyboardModule.cpp" compile="1" resource="0"
                     file="Source/Module/modules/controller/keyboard/KeyboardModule.cpp"/>
               <FILE id="CYr9Wv" name="KeyboardModule.h" compile="0" resource="0"
@@ -676,14 +814,6 @@
                     file="Source/Module/modules/controller/kinect/KinectV2Module.cpp"/>
               <FILE id="gkYUw8" name="KinectV2Module.h" compile="0" resource="0"
                     file="Source/Module/modules/controller/kinect/KinectV2Module.h"/>
-            </GROUP>
-            <GROUP id="{7CF2541F-097E-D32B-7682-C86600F9F999}" name="myo">
-              <FILE id="MqK4jo" name="MyoDevice.cpp" compile="1" resource="0" file="Source/Module/modules/controller/myo/MyoDevice.cpp"/>
-              <FILE id="M4OLjS" name="MyoDevice.h" compile="0" resource="0" file="Source/Module/modules/controller/myo/MyoDevice.h"/>
-              <FILE id="qHUV7r" name="MyoManager.cpp" compile="1" resource="0" file="Source/Module/modules/controller/myo/MyoManager.cpp"/>
-              <FILE id="Q9SGz1" name="MyoManager.h" compile="0" resource="0" file="Source/Module/modules/controller/myo/MyoManager.h"/>
-              <FILE id="SHDyQS" name="MyoModule.cpp" compile="1" resource="0" file="Source/Module/modules/controller/myo/MyoModule.cpp"/>
-              <FILE id="cOpTQZ" name="MyoModule.h" compile="0" resource="0" file="Source/Module/modules/controller/myo/MyoModule.h"/>
             </GROUP>
             <GROUP id="{5C43D0FF-4039-779F-7FA4-032B36B34800}" name="wiimote">
               <GROUP id="{EB8DE141-947F-6061-BC9C-3DFD7641DEAA}" name="lib">
@@ -775,12 +905,6 @@
                     file="Source/Module/modules/midi/commands/MIDICommands.cpp"/>
               <FILE id="XXXL2t" name="MIDICommands.h" compile="0" resource="0" file="Source/Module/modules/midi/commands/MIDICommands.h"/>
             </GROUP>
-            <GROUP id="{EC4AAFFE-0A29-00EE-1387-BD4F26B16B50}" name="Launchpad">
-              <FILE id="ayHbBk" name="LaunchpadModule.cpp" compile="1" resource="0"
-                    file="Source/Module/modules/midi/Launchpad/LaunchpadModule.cpp"/>
-              <FILE id="JD2TxJ" name="LaunchpadModule.h" compile="0" resource="0"
-                    file="Source/Module/modules/midi/Launchpad/LaunchpadModule.h"/>
-            </GROUP>
             <FILE id="GmYxyc" name="MIDIModule.cpp" compile="1" resource="0" file="Source/Module/modules/midi/MIDIModule.cpp"/>
             <FILE id="dCkFW4" name="MIDIModule.h" compile="0" resource="0" file="Source/Module/modules/midi/MIDIModule.h"/>
           </GROUP>
@@ -833,7 +957,6 @@
                 <FILE id="j9kqDf" name="CustomOSCCommand.h" compile="0" resource="0"
                       file="Source/Module/modules/osc/custom/commands/CustomOSCCommand.h"/>
               </GROUP>
-              <GROUP id="{9250F3A5-C125-53BC-D4F9-C4F34175C990}" name="ui"/>
               <FILE id="zsmxfd" name="CustomOSCModule.cpp" compile="1" resource="0"
                     file="Source/Module/modules/osc/custom/CustomOSCModule.cpp"/>
               <FILE id="zBRcyQ" name="CustomOSCModule.h" compile="0" resource="0"
@@ -867,12 +990,6 @@
             </GROUP>
             <GROUP id="{88D89CC2-0F11-F9D4-467D-F7DCB753EB24}" name="reaper">
               <GROUP id="{D7999668-7E30-E1C3-9372-F0C5A8F8BEE3}" name="commands">
-                <GROUP id="{434F557F-9087-7B07-8D12-230D1D9A1EF6}" name="ui">
-                  <FILE id="sfonBE" name="ReaperTimeCommandUI.cpp" compile="1" resource="0"
-                        file="Source/Module/modules/osc/reaper/commands/ui/ReaperTimeCommandUI.cpp"/>
-                  <FILE id="MaqUus" name="ReaperTimeCommandUI.h" compile="0" resource="0"
-                        file="Source/Module/modules/osc/reaper/commands/ui/ReaperTimeCommandUI.h"/>
-                </GROUP>
                 <FILE id="r4pLqR" name="ReaperTimeCommand.cpp" compile="1" resource="0"
                       file="Source/Module/modules/osc/reaper/commands/ReaperTimeCommand.cpp"/>
                 <FILE id="rrTiVc" name="ReaperTimeCommand.h" compile="0" resource="0"
@@ -959,6 +1076,10 @@
                       file="Source/Module/modules/system/os/commands/OSPowerCommand.cpp"/>
                 <FILE id="uRplxR" name="OSPowerCommand.h" compile="0" resource="0"
                       file="Source/Module/modules/system/os/commands/OSPowerCommand.h"/>
+                <FILE id="GqkIP5" name="OSWindowCommand.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/system/os/commands/OSWindowCommand.cpp"/>
+                <FILE id="XoRTue" name="OSWindowCommand.h" compile="0" resource="0"
+                      file="Source/Module/modules/system/os/commands/OSWindowCommand.h"/>
                 <FILE id="UVisev" name="WakeOnLanCommand.cpp" compile="1" resource="0"
                       file="Source/Module/modules/system/os/commands/WakeOnLanCommand.cpp"/>
                 <FILE id="KRSW2s" name="WakeOnLanCommand.h" compile="0" resource="0"
@@ -981,29 +1102,45 @@
             <FILE id="JLZs5a" name="HTTPModule.h" compile="0" resource="0" file="Source/Module/modules/http/HTTPModule.h"/>
           </GROUP>
           <GROUP id="{60EE0B8D-6DCD-2F5E-B462-3F4F3DCA4184}" name="tcp">
-            <GROUP id="{FB246D43-D01D-0AD6-DB10-303294A627F9}" name="pjlink">
-              <FILE id="NB0pJT" name="PJLinkModule.cpp" compile="1" resource="0"
-                    file="Source/Module/modules/tcp/pjlink/PJLinkModule.cpp"/>
-              <FILE id="lFlEGK" name="PJLinkModule.h" compile="0" resource="0" file="Source/Module/modules/tcp/pjlink/PJLinkModule.h"/>
-            </GROUP>
-            <GROUP id="{A5846165-A407-545A-856D-4D8DFDA6055D}" name="vlc">
-              <FILE id="zzEPys" name="VLCModule.cpp" compile="1" resource="0" file="Source/Module/modules/tcp/vlc/VLCModule.cpp"/>
-              <FILE id="fhFaRD" name="VLCModule.h" compile="0" resource="0" file="Source/Module/modules/tcp/vlc/VLCModule.h"/>
-            </GROUP>
-            <GROUP id="{4F7005AE-9CD8-F426-EF55-DD62C5A06E36}" name="watchout">
-              <GROUP id="{B9A030BA-4582-23EB-A96F-03AFA7BF577E}" name="commands">
-                <FILE id="tWmM0b" name="WatchoutCommand.cpp" compile="1" resource="0"
-                      file="Source/Module/modules/tcp/watchout/commands/WatchoutCommand.cpp"/>
-                <FILE id="Vka5kM" name="WatchoutCommand.h" compile="0" resource="0"
-                      file="Source/Module/modules/tcp/watchout/commands/WatchoutCommand.h"/>
+            <GROUP id="{8D7C6264-1681-0666-5410-2523AE1B6FC1}" name="tcpserver">
+              <GROUP id="{3586C115-8317-8ED7-FDFE-E0428B2754C4}" name="ui">
+                <FILE id="BTLrla" name="TCPServerModuleUI.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/tcp/tcpserver/ui/TCPServerModuleUI.cpp"/>
+                <FILE id="Y7qDDE" name="TCPServerModuleUI.h" compile="0" resource="0"
+                      file="Source/Module/modules/tcp/tcpserver/ui/TCPServerModuleUI.h"/>
               </GROUP>
-              <FILE id="Avh6N9" name="WatchoutModule.cpp" compile="1" resource="0"
-                    file="Source/Module/modules/tcp/watchout/WatchoutModule.cpp"/>
-              <FILE id="Dw8o7I" name="WatchoutModule.h" compile="0" resource="0"
-                    file="Source/Module/modules/tcp/watchout/WatchoutModule.h"/>
+              <FILE id="KPXcik" name="TCPServerConnectionManager.cpp" compile="1"
+                    resource="0" file="Source/Module/modules/tcp/tcpserver/TCPServerConnectionManager.cpp"/>
+              <FILE id="WneJRn" name="TCPServerConnectionManager.h" compile="0" resource="0"
+                    file="Source/Module/modules/tcp/tcpserver/TCPServerConnectionManager.h"/>
+              <FILE id="dfI4o7" name="TCPServerModule.cpp" compile="1" resource="0"
+                    file="Source/Module/modules/tcp/tcpserver/TCPServerModule.cpp"/>
+              <FILE id="l0K6Zw" name="TCPServerModule.h" compile="0" resource="0"
+                    file="Source/Module/modules/tcp/tcpserver/TCPServerModule.h"/>
             </GROUP>
-            <FILE id="bEmLRO" name="TCPModule.cpp" compile="1" resource="0" file="Source/Module/modules/tcp/TCPModule.cpp"/>
-            <FILE id="LvrUiO" name="TCPModule.h" compile="0" resource="0" file="Source/Module/modules/tcp/TCPModule.h"/>
+            <GROUP id="{EADB0130-532F-2520-BBA3-A72E5A2C0C1E}" name="tcpclient">
+              <GROUP id="{D1DD19AA-A54A-A2C4-74C2-387FA9D7D733}" name="pjlink">
+                <FILE id="GN4KEU" name="PJLinkModule.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/tcp/tcpclient/pjlink/PJLinkModule.cpp"/>
+                <FILE id="WlzAAJ" name="PJLinkModule.h" compile="0" resource="0" file="Source/Module/modules/tcp/tcpclient/pjlink/PJLinkModule.h"/>
+              </GROUP>
+              <GROUP id="{9D17EC97-106B-0725-8345-5F980F75F41B}" name="watchout">
+                <GROUP id="{2737ADD7-CED7-52D1-1D60-B63B50947807}" name="commands">
+                  <FILE id="Hxn6iB" name="WatchoutCommand.cpp" compile="1" resource="0"
+                        file="Source/Module/modules/tcp/tcpclient/watchout/commands/WatchoutCommand.cpp"/>
+                  <FILE id="DUVk4w" name="WatchoutCommand.h" compile="0" resource="0"
+                        file="Source/Module/modules/tcp/tcpclient/watchout/commands/WatchoutCommand.h"/>
+                </GROUP>
+                <FILE id="Wo0ptc" name="WatchoutModule.cpp" compile="1" resource="0"
+                      file="Source/Module/modules/tcp/tcpclient/watchout/WatchoutModule.cpp"/>
+                <FILE id="mHtiqP" name="WatchoutModule.h" compile="0" resource="0"
+                      file="Source/Module/modules/tcp/tcpclient/watchout/WatchoutModule.h"/>
+              </GROUP>
+              <FILE id="C2MK5S" name="TCPClientModule.cpp" compile="1" resource="0"
+                    file="Source/Module/modules/tcp/tcpclient/TCPClientModule.cpp"/>
+              <FILE id="F0NvXo" name="TCPClientModule.h" compile="0" resource="0"
+                    file="Source/Module/modules/tcp/tcpclient/TCPClientModule.h"/>
+            </GROUP>
           </GROUP>
           <GROUP id="{7D2E89CA-CA8A-BD26-BC58-F2AE92B13C90}" name="udp">
             <FILE id="uUdZAS" name="UDPModule.cpp" compile="1" resource="0" file="Source/Module/modules/udp/UDPModule.cpp"/>
@@ -1114,195 +1251,118 @@
               file="Source/StateMachine/StateManager.cpp"/>
         <FILE id="UliENL" name="StateManager.h" compile="0" resource="0" file="Source/StateMachine/StateManager.h"/>
       </GROUP>
-      <GROUP id="{4E8B7BB9-54DB-2C2D-2DE2-E9E57DF055ED}" name="TimeMachine">
-        <GROUP id="{BADAC7AC-C589-BF99-32CC-E0BDED5F03B1}" name="Sequence">
-          <GROUP id="{678C11D1-72E6-E0B9-07E9-F27F5989123B}" name="Cue">
-            <GROUP id="{61A3631A-41D9-3225-D46A-52A1E7DD9291}" name="ui">
-              <FILE id="s4LjRi" name="TimeCueManagerUI.cpp" compile="1" resource="0"
-                    file="Source/TimeMachine/Sequence/Cue/ui/TimeCueManagerUI.cpp"/>
-              <FILE id="vKeKWG" name="TimeCueManagerUI.h" compile="0" resource="0"
-                    file="Source/TimeMachine/Sequence/Cue/ui/TimeCueManagerUI.h"/>
-              <FILE id="n9hsWu" name="TimeCueUI.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Cue/ui/TimeCueUI.cpp"/>
-              <FILE id="DP0GuT" name="TimeCueUI.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Cue/ui/TimeCueUI.h"/>
+      <GROUP id="{385034AB-BB8A-1A0B-677C-4890320C1929}" name="TimeMachine">
+        <GROUP id="{34E053CC-6BB4-AEF4-A5AE-B46B09297363}" name="Sequence">
+          <GROUP id="{D10B0FB5-159B-06C6-95CF-79B2E2FE1F11}" name="layers">
+            <GROUP id="{11579F84-0750-EA75-82AA-9E0475910F93}" name="trigger">
+              <FILE id="eaRx9H" name="ChataigneTriggerLayer.cpp" compile="1" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/trigger/ChataigneTriggerLayer.cpp"/>
+              <FILE id="wPyEZW" name="ChataigneTriggerLayer.h" compile="0" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/trigger/ChataigneTriggerLayer.h"/>
+              <FILE id="eFjJCi" name="ChataigneTimeTrigger.cpp" compile="1" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/trigger/ChataigneTimeTrigger.cpp"/>
+              <FILE id="QVCq4r" name="ChataigneTimeTrigger.h" compile="0" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/trigger/ChataigneTimeTrigger.h"/>
             </GROUP>
-            <FILE id="qHDtrj" name="TimeCue.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Cue/TimeCue.cpp"/>
-            <FILE id="Ftf0dK" name="TimeCue.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Cue/TimeCue.h"/>
-            <FILE id="BJN8Nn" name="TimeCueManager.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/Cue/TimeCueManager.cpp"/>
-            <FILE id="qfgyUf" name="TimeCueManager.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/Cue/TimeCueManager.h"/>
-          </GROUP>
-          <GROUP id="{5E5CE20F-0045-70EC-835B-AF327CC94251}" name="Layer">
-            <GROUP id="{E5E100AF-4067-652C-9F45-C69AF8DB997B}" name="layers">
-              <GROUP id="{85946119-D8E6-6446-5275-30B401773014}" name="audio">
-                <GROUP id="{859A33F3-D518-5746-5399-FF98E4F3F168}" name="ui">
-                  <FILE id="Yg3gfK" name="AudioLayerClipManagerUI.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerClipManagerUI.cpp"/>
-                  <FILE id="MxHQ34" name="AudioLayerClipManagerUI.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerClipManagerUI.h"/>
-                  <FILE id="iWogi3" name="AudioLayerClipUI.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerClipUI.cpp"/>
-                  <FILE id="uWdLEP" name="AudioLayerClipUI.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerClipUI.h"/>
-                  <FILE id="FFJFrS" name="AudioLayerPanel.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerPanel.cpp"/>
-                  <FILE id="nhOSiG" name="AudioLayerPanel.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerPanel.h"/>
-                  <FILE id="dRXkV5" name="AudioLayerTimeline.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerTimeline.cpp"/>
-                  <FILE id="KzuWBw" name="AudioLayerTimeline.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/audio/ui/AudioLayerTimeline.h"/>
-                </GROUP>
-                <FILE id="kzZG8y" name="AudioLayer.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayer.cpp"/>
-                <FILE id="ZT2Fvv" name="AudioLayer.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayer.h"/>
-                <FILE id="JUsFhe" name="AudioLayerClip.cpp" compile="1" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayerClip.cpp"/>
-                <FILE id="n6p9WH" name="AudioLayerClip.h" compile="0" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayerClip.h"/>
-                <FILE id="OhSi7J" name="AudioLayerClipManager.cpp" compile="1" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayerClipManager.cpp"/>
-                <FILE id="Ocgorv" name="AudioLayerClipManager.h" compile="0" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/audio/AudioLayerClipManager.h"/>
+            <GROUP id="{FB6A16ED-AF1A-4851-B4BF-65CA88B1942C}" name="audio">
+              <GROUP id="{40C039F6-5D82-E09C-0BCC-4CBF9F98F4F9}" name="ui">
+                <FILE id="q7qyC5" name="ChataigneAudioLayerPanel.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/audio/ui/ChataigneAudioLayerPanel.cpp"/>
+                <FILE id="FwvBpL" name="ChataigneAudioLayerPanel.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/audio/ui/ChataigneAudioLayerPanel.h"/>
               </GROUP>
-              <GROUP id="{770C85C4-198C-C99D-5E69-F5253EE96372}" name="mapping">
-                <GROUP id="{7C406034-B71A-C5FF-375C-F259CFEE9ACD}" name="timecolor">
-                  <GROUP id="{550A086C-3DBA-5CDF-12A9-ED3C77424075}" name="ui">
-                    <FILE id="cocOxp" name="TimeColorManagerUI.cpp" compile="1" resource="0"
-                          file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/ui/TimeColorManagerUI.cpp"/>
-                    <FILE id="aHcHgE" name="TimeColorManagerUI.h" compile="0" resource="0"
-                          file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/ui/TimeColorManagerUI.h"/>
-                    <FILE id="K6U3Cu" name="TimeColorUI.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/ui/TimeColorUI.cpp"/>
-                    <FILE id="ziSTaT" name="TimeColorUI.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/ui/TimeColorUI.h"/>
+              <FILE id="crs36i" name="ChataigneAudioLayer.cpp" compile="1" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/audio/ChataigneAudioLayer.cpp"/>
+              <FILE id="cyfYIR" name="ChataigneAudioLayer.h" compile="0" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/audio/ChataigneAudioLayer.h"/>
+              <FILE id="v7RjWc" name="ChataigneAudioLayerListener.h" compile="0"
+                    resource="0" file="Source/TimeMachine/Sequence/layers/audio/ChataigneAudioLayerListener.h"/>
+            </GROUP>
+            <GROUP id="{43CDA754-BA40-749C-1F35-8733A474B6F9}" name="mapping">
+              <GROUP id="{C7E90FCA-FCE6-0938-2459-5EDE9655B2E5}" name="automation">
+                <GROUP id="{497E0A64-276F-5258-B82E-3295818D25A0}" name="ui">
+                  <FILE id="vozDgK" name="AutomationMappingLayerPanel.cpp" compile="1"
+                        resource="0" file="Source/TimeMachine/Sequence/layers/mapping/automation/ui/AutomationMappingLayerPanel.cpp"/>
+                  <FILE id="XcbARi" name="AutomationMappingLayerPanel.h" compile="0"
+                        resource="0" file="Source/TimeMachine/Sequence/layers/mapping/automation/ui/AutomationMappingLayerPanel.h"/>
+                  <FILE id="uMSGxh" name="AutomationMappingLayerTimeline.cpp" compile="1"
+                        resource="0" file="Source/TimeMachine/Sequence/layers/mapping/automation/ui/AutomationMappingLayerTimeline.cpp"/>
+                  <FILE id="ZJbWsg" name="AutomationMappingLayerTimeline.h" compile="0"
+                        resource="0" file="Source/TimeMachine/Sequence/layers/mapping/automation/ui/AutomationMappingLayerTimeline.h"/>
+                </GROUP>
+                <GROUP id="{056AC38B-8A54-1798-4436-05495EAE3919}" name="1d">
+                  <GROUP id="{1678B326-4AE4-9E40-F5C5-7BF9787912F9}" name="ui">
+                    <FILE id="jDAWVt" name="Mapping1DLayerPanel.cpp" compile="1" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/1d/ui/Mapping1DLayerPanel.cpp"/>
+                    <FILE id="PqMNVn" name="Mapping1DLayerPanel.h" compile="0" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/1d/ui/Mapping1DLayerPanel.h"/>
                   </GROUP>
-                  <FILE id="aqdM3o" name="TimeColor.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/TimeColor.cpp"/>
-                  <FILE id="izb4kE" name="TimeColor.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/TimeColor.h"/>
-                  <FILE id="M8u6eN" name="TimeColorManager.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/TimeColorManager.cpp"/>
-                  <FILE id="L1KSDu" name="TimeColorManager.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/timecolor/TimeColorManager.h"/>
+                  <FILE id="XDqpsx" name="Mapping1DLayer.cpp" compile="1" resource="0"
+                        file="Source/TimeMachine/Sequence/layers/mapping/automation/1d/Mapping1DLayer.cpp"/>
+                  <FILE id="FmxPuw" name="Mapping1DLayer.h" compile="0" resource="0"
+                        file="Source/TimeMachine/Sequence/layers/mapping/automation/1d/Mapping1DLayer.h"/>
                 </GROUP>
-                <GROUP id="{27B9256C-F408-88F4-3258-FED033D5FEE8}" name="ui">
-                  <FILE id="mPRFzE" name="MappingLayerEditor.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerEditor.cpp"/>
-                  <FILE id="wujDWg" name="MappingLayerEditor.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerEditor.h"/>
-                  <FILE id="VF5MU8" name="MappingLayerPanel.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerPanel.cpp"/>
-                  <FILE id="nfrOdY" name="MappingLayerPanel.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerPanel.h"/>
-                  <FILE id="l1Je2i" name="MappingLayerTimeline.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerTimeline.cpp"/>
-                  <FILE id="IOQAhq" name="MappingLayerTimeline.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/mapping/ui/MappingLayerTimeline.h"/>
+                <GROUP id="{91044AED-92C4-815B-2BD7-B66B8E52C51C}" name="2d">
+                  <GROUP id="{64B3E1EF-FF8D-7F0B-77ED-95F1F08C504A}" name="ui">
+                    <FILE id="C4yyq5" name="Mapping2DLayerPanel.cpp" compile="1" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/ui/Mapping2DLayerPanel.cpp"/>
+                    <FILE id="d3ovBS" name="Mapping2DLayerPanel.h" compile="0" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/ui/Mapping2DLayerPanel.h"/>
+                    <FILE id="UBYpfW" name="Mapping2DLayerTimeline.cpp" compile="1" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/ui/Mapping2DLayerTimeline.cpp"/>
+                    <FILE id="o0CzJ4" name="Mapping2DLayerTimeline.h" compile="0" resource="0"
+                          file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/ui/Mapping2DLayerTimeline.h"/>
+                  </GROUP>
+                  <FILE id="RnHeRx" name="Mapping2DLayer.cpp" compile="1" resource="0"
+                        file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/Mapping2DLayer.cpp"/>
+                  <FILE id="kA47dP" name="Mapping2DLayer.h" compile="0" resource="0"
+                        file="Source/TimeMachine/Sequence/layers/mapping/automation/2d/Mapping2DLayer.h"/>
                 </GROUP>
-                <FILE id="Pk8U7b" name="MappingLayer.cpp" compile="1" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/mapping/MappingLayer.cpp"/>
-                <FILE id="sQUEW6" name="MappingLayer.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/mapping/MappingLayer.h"/>
+                <FILE id="xOagnY" name="AutomationMappingLayer.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/automation/AutomationMappingLayer.cpp"/>
+                <FILE id="XxoCsa" name="AutomationMappingLayer.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/automation/AutomationMappingLayer.h"/>
               </GROUP>
-              <GROUP id="{A1A8F1F2-62C2-FA25-D175-1DEACDE0DD1A}" name="trigger">
-                <GROUP id="{3CA908B3-C0BD-448D-D26E-D0C57F8387B4}" name="ui">
-                  <FILE id="JozeUu" name="TimeTriggerManagerUI.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerManagerUI.cpp"/>
-                  <FILE id="e7W19o" name="TimeTriggerManagerUI.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerManagerUI.h"/>
-                  <FILE id="FAal2C" name="TimeTriggerMultiTransformer.cpp" compile="1"
-                        resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerMultiTransformer.cpp"/>
-                  <FILE id="Ve5hTG" name="TimeTriggerMultiTransformer.h" compile="0"
-                        resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerMultiTransformer.h"/>
-                  <FILE id="rfZgiT" name="TimeTriggerUI.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerUI.cpp"/>
-                  <FILE id="pn8LMa" name="TimeTriggerUI.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TimeTriggerUI.h"/>
-                  <FILE id="VBKxd1" name="TriggerLayerPanel.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TriggerLayerPanel.cpp"/>
-                  <FILE id="VDoK4z" name="TriggerLayerPanel.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TriggerLayerPanel.h"/>
-                  <FILE id="Sry5UY" name="TriggerLayerTimeline.cpp" compile="1" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TriggerLayerTimeline.cpp"/>
-                  <FILE id="dezg00" name="TriggerLayerTimeline.h" compile="0" resource="0"
-                        file="Source/TimeMachine/Sequence/Layer/layers/trigger/ui/TriggerLayerTimeline.h"/>
+              <GROUP id="{7CF7C72F-139D-BE32-4A80-D7F4965A04B1}" name="color">
+                <GROUP id="{10659B85-B7BE-82AF-88A1-AF33687EAFF5}" name="ui">
+                  <FILE id="ztmGRz" name="ColorMappingLayerTimeline.cpp" compile="1"
+                        resource="0" file="Source/TimeMachine/Sequence/layers/mapping/color/ui/ColorMappingLayerTimeline.cpp"/>
+                  <FILE id="oCwuj3" name="ColorMappingLayerTimeline.h" compile="0" resource="0"
+                        file="Source/TimeMachine/Sequence/layers/mapping/color/ui/ColorMappingLayerTimeline.h"/>
                 </GROUP>
-                <FILE id="Zgg78t" name="TimeTrigger.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/TimeTrigger.cpp"/>
-                <FILE id="N5oQrA" name="TimeTrigger.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/TimeTrigger.h"/>
-                <FILE id="mBDJdc" name="TimeTriggerManager.cpp" compile="1" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/trigger/TimeTriggerManager.cpp"/>
-                <FILE id="gvcSDP" name="TimeTriggerManager.h" compile="0" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/trigger/TimeTriggerManager.h"/>
-                <FILE id="COuKjG" name="TriggerLayer.cpp" compile="1" resource="0"
-                      file="Source/TimeMachine/Sequence/Layer/layers/trigger/TriggerLayer.cpp"/>
-                <FILE id="cDjftK" name="TriggerLayer.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/layers/trigger/TriggerLayer.h"/>
+                <FILE id="c1F6G4" name="ColorMappingLayer.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/color/ColorMappingLayer.cpp"/>
+                <FILE id="SX0Awq" name="ColorMappingLayer.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/color/ColorMappingLayer.h"/>
               </GROUP>
+              <GROUP id="{071E6E14-B2B7-5D15-02BF-BCC713578CF2}" name="ui">
+                <FILE id="u3Ftks" name="MappingLayerEditor.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerEditor.cpp"/>
+                <FILE id="JS8hYq" name="MappingLayerEditor.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerEditor.h"/>
+                <FILE id="L2jHkN" name="MappingLayerPanel.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerPanel.cpp"/>
+                <FILE id="wJQyUC" name="MappingLayerPanel.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerPanel.h"/>
+                <FILE id="gXuMS4" name="MappingLayerTimeline.cpp" compile="1" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerTimeline.cpp"/>
+                <FILE id="bqsE58" name="MappingLayerTimeline.h" compile="0" resource="0"
+                      file="Source/TimeMachine/Sequence/layers/mapping/ui/MappingLayerTimeline.h"/>
+              </GROUP>
+              <FILE id="wxLkNN" name="MappingLayer.cpp" compile="1" resource="0"
+                    file="Source/TimeMachine/Sequence/layers/mapping/MappingLayer.cpp"/>
+              <FILE id="WBJmQT" name="MappingLayer.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/layers/mapping/MappingLayer.h"/>
             </GROUP>
-            <GROUP id="{7B408CF2-C22E-0C44-5614-C80E9D903A72}" name="ui">
-              <FILE id="fupkTO" name="SequenceLayerPanel.cpp" compile="1" resource="0"
-                    file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerPanel.cpp"/>
-              <FILE id="y67tIC" name="SequenceLayerPanel.h" compile="0" resource="0"
-                    file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerPanel.h"/>
-              <FILE id="RnDYmX" name="SequenceLayerPanelManagerUI.cpp" compile="1"
-                    resource="0" file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerPanelManagerUI.cpp"/>
-              <FILE id="CiE9cS" name="SequenceLayerPanelManagerUI.h" compile="0"
-                    resource="0" file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerPanelManagerUI.h"/>
-              <FILE id="Feg5V0" name="SequenceLayerTimeline.cpp" compile="1" resource="0"
-                    file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerTimeline.cpp"/>
-              <FILE id="uNTedF" name="SequenceLayerTimeline.h" compile="0" resource="0"
-                    file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerTimeline.h"/>
-              <FILE id="iB82X9" name="SequenceLayerTimelineManagerUI.cpp" compile="1"
-                    resource="0" file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerTimelineManagerUI.cpp"/>
-              <FILE id="wb1sG7" name="SequenceLayerTimelineManagerUI.h" compile="0"
-                    resource="0" file="Source/TimeMachine/Sequence/Layer/ui/SequenceLayerTimelineManagerUI.h"/>
-            </GROUP>
-            <FILE id="pIMj01" name="SequenceLayer.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/Layer/SequenceLayer.cpp"/>
-            <FILE id="ww3c3Z" name="SequenceLayer.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Layer/SequenceLayer.h"/>
-            <FILE id="ZkcwyB" name="SequenceLayerFactory.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/Layer/SequenceLayerFactory.cpp"/>
-            <FILE id="EBhQuT" name="SequenceLayerFactory.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/Layer/SequenceLayerFactory.h"/>
-            <FILE id="rk3X8P" name="SequenceLayerManager.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/Layer/SequenceLayerManager.cpp"/>
-            <FILE id="X8Efal" name="SequenceLayerManager.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/Layer/SequenceLayerManager.h"/>
           </GROUP>
-          <GROUP id="{832D2C2D-9936-2CE1-55E9-14710BD4220C}" name="ui">
-            <FILE id="zluEjq" name="SequenceEditor.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceEditor.cpp"/>
-            <FILE id="wm6YZz" name="SequenceEditor.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceEditor.h"/>
-            <FILE id="m7aZHw" name="SequenceTimelineHeader.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTimelineHeader.cpp"/>
-            <FILE id="WIA4ma" name="SequenceTimelineHeader.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTimelineHeader.h"/>
-            <FILE id="xZvcym" name="SequenceTimelineNavigationUI.cpp" compile="1"
-                  resource="0" file="Source/TimeMachine/Sequence/ui/SequenceTimelineNavigationUI.cpp"/>
-            <FILE id="sTznep" name="SequenceTimelineNavigationUI.h" compile="0"
-                  resource="0" file="Source/TimeMachine/Sequence/ui/SequenceTimelineNavigationUI.h"/>
-            <FILE id="s4N96n" name="SequenceTimelineSeeker.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTimelineSeeker.cpp"/>
-            <FILE id="i5cm6N" name="SequenceTimelineSeeker.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTimelineSeeker.h"/>
-            <FILE id="GQnSBT" name="SequenceTransportUI.cpp" compile="1" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTransportUI.cpp"/>
-            <FILE id="YcGA7Z" name="SequenceTransportUI.h" compile="0" resource="0"
-                  file="Source/TimeMachine/Sequence/ui/SequenceTransportUI.h"/>
-            <FILE id="N1PQD7" name="SequenceUI.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/ui/SequenceUI.cpp"/>
-            <FILE id="Xv6aFu" name="SequenceUI.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/ui/SequenceUI.h"/>
-          </GROUP>
-          <FILE id="DeE774" name="Sequence.cpp" compile="1" resource="0" file="Source/TimeMachine/Sequence/Sequence.cpp"/>
-          <FILE id="fAxHjv" name="Sequence.h" compile="0" resource="0" file="Source/TimeMachine/Sequence/Sequence.h"/>
+          <FILE id="AgsPCv" name="ChataigneSequence.cpp" compile="1" resource="0"
+                file="Source/TimeMachine/Sequence/ChataigneSequence.cpp"/>
+          <FILE id="NAOj5I" name="ChataigneSequence.h" compile="0" resource="0"
+                file="Source/TimeMachine/Sequence/ChataigneSequence.h"/>
         </GROUP>
-        <GROUP id="{3885DBBB-ADD1-B8D3-664E-9CAFB235AEA3}" name="ui">
-          <FILE id="XxZkWP" name="SequenceManagerUI.cpp" compile="1" resource="0"
-                file="Source/TimeMachine/ui/SequenceManagerUI.cpp"/>
-          <FILE id="lMrtji" name="SequenceManagerUI.h" compile="0" resource="0"
-                file="Source/TimeMachine/ui/SequenceManagerUI.h"/>
-          <FILE id="A4oUmb" name="TimeMachineView.cpp" compile="1" resource="0"
-                file="Source/TimeMachine/ui/TimeMachineView.cpp"/>
-          <FILE id="g6TXSm" name="TimeMachineView.h" compile="0" resource="0"
-                file="Source/TimeMachine/ui/TimeMachineView.h"/>
-        </GROUP>
-        <FILE id="pYwlbT" name="SequenceManager.cpp" compile="1" resource="0"
-              file="Source/TimeMachine/SequenceManager.cpp"/>
-        <FILE id="z3tHxx" name="SequenceManager.h" compile="0" resource="0"
-              file="Source/TimeMachine/SequenceManager.h"/>
+        <FILE id="SBO8Vt" name="ChataigneSequenceManager.cpp" compile="1" resource="0"
+              file="Source/TimeMachine/ChataigneSequenceManager.cpp"/>
+        <FILE id="EadjSJ" name="ChataigneSequenceManager.h" compile="0" resource="0"
+              file="Source/TimeMachine/ChataigneSequenceManager.h"/>
       </GROUP>
       <GROUP id="{FA0E78EC-9F83-99D0-4BB9-C686CC8B957D}" name="UI">
         <FILE id="HYpDUa" name="AboutWindow.cpp" compile="1" resource="0" file="Source/UI/AboutWindow.cpp"/>
@@ -1311,6 +1371,9 @@
               file="Source/UI/ChataigneAssetManager.cpp"/>
         <FILE id="nDo7Cu" name="ChataigneAssetManager.h" compile="0" resource="0"
               file="Source/UI/ChataigneAssetManager.h"/>
+        <FILE id="Oq9vEL" name="WelcomeScreen.cpp" compile="1" resource="0"
+              file="Source/UI/WelcomeScreen.cpp"/>
+        <FILE id="H2TuzF" name="WelcomeScreen.h" compile="0" resource="0" file="Source/UI/WelcomeScreen.h"/>
       </GROUP>
       <FILE id="miMqpn" name="ChataigneEngine.cpp" compile="1" resource="0"
             file="Source/ChataigneEngine.cpp"/>
@@ -1323,26 +1386,24 @@
             file="Source/MainComponent.cpp"/>
       <FILE id="ue12z5" name="MainComponentCommands.cpp" compile="1" resource="0"
             file="Source/MainComponentCommands.cpp"/>
-      <FILE id="FIKyBS" name="CrashHandler.cpp" compile="1" resource="0"
-            file="Source/CrashHandler.cpp"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
     <VS2019 targetFolder="Builds/VisualStudio2019" extraDefs="USE_KINECT=1"
-            externalLibraries="Setupapi.lib&#10;hid.lib&#10;Kinect20.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib"
+            externalLibraries="Setupapi.lib&#10;hid.lib&#10;Kinect20.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib&#10;hid.lib&#10;hidapi_static.lib"
             smallIcon="nVz6Li" bigIcon="nVz6Li">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/ois/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug"
-                       binaryPath="Binaries/Debug"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release"
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release&#10;../../External/hidapi/lib/win/x64"
                        binaryPath="Binaries"/>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/ois/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug&#10;../../External/hidapi/lib/win/x64"
+                       binaryPath="Binaries/Debug"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video"/>
         <MODULEPATH id="juce_osc"/>
-        <MODULEPATH id="juce_organicui"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
         <MODULEPATH id="juce_opengl"/>
         <MODULEPATH id="juce_gui_extra"/>
         <MODULEPATH id="juce_gui_basics"/>
@@ -1353,95 +1414,65 @@
         <MODULEPATH id="juce_core"/>
         <MODULEPATH id="juce_audio_utils"/>
         <MODULEPATH id="juce_audio_processors"/>
-        <MODULEPATH id="juce_audio_formats"/>
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_basics"/>
         <MODULEPATH id="juce_analytics"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_audio_formats"/>
       </MODULEPATHS>
     </VS2019>
-    <VS2017 targetFolder="Builds/VisualStudio2017" externalLibraries="Setupapi.lib&#10;hid.lib&#10;Kinect20.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib"
-            smallIcon="nVz6Li" bigIcon="nVz6Li" extraDefs="USE_KINECT=1">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/ois/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug"
-                       binaryPath="Binaries/Debug" debugInformationFormat="ProgramDatabase"/>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       optimisation="3" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release"
-                       binaryPath="Binaries" debugInformationFormat="ProgramDatabase"
-                       linkTimeOptimisation="1"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_osc" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
-        <MODULEPATH id="juce_opengl" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_extra" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_analytics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
-      </MODULEPATHS>
-    </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="nVz6Li" bigIcon="nVz6Li"
-               extraFrameworks="IOBluetooth" extraCompilerFlags="" documentExtensions="noisette"
-               customPList="&lt;plist&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;&#9;&#9;&lt;true/&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;"
-               externalLibraries="Servus&#10;artnet" microphonePermissionNeeded="1"
-               hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.device.audio-input">
+               extraFrameworks="IOBluetooth, ForceFeedback, IOKit" extraCompilerFlags=""
+               documentExtensions="noisette" customPList="&lt;plist&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;&#9;&#9;&lt;true/&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;"
+               externalLibraries="Servus&#10;artnet&#10;hidapi&#10;joytime-core&#10;joytime-input-hidapi&#10;SDL2&#10;iconv"
+               microphonePermissionNeeded="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.device.audio-input"
+               extraDefs="JUCE_SUPPORT_CARBON=0">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Chataigne"
-                       headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
+                       headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/joycon/include&#10;../../External/sdl/include&#10;../../External/hidapi/include"
                        cppLanguageStandard="c++11" cppLibType="libc++" enablePluginBinaryCopyStep="1"
-                       osxCompatibility="10.8 SDK" libraryPath="../../External/servus/lib/osx/debug&#10;../../External/libartnet/lib/osx"/>
-        <CONFIGURATION name="Release" optimisation="3" targetName="Chataigne" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
-                       enablePluginBinaryCopyStep="1" osxCompatibility="10.8 SDK" libraryPath="../../External/servus/lib/osx/release&#10;../../External/libartnet/lib/osx"/>
+                       osxCompatibility="10.8 SDK" libraryPath="../../External/servus/lib/osx/debug&#10;../../External/libartnet/lib/osx&#10;../../External/joycon/lib/osx&#10;../../External/sdl/lib/osx"/>
+        <CONFIGURATION name="Release" optimisation="3" targetName="Chataigne" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/joycon/include&#10;../../External/sdl/include&#10;../../External/hidapi/include"
+                       enablePluginBinaryCopyStep="1" osxCompatibility="10.8 SDK" libraryPath="../../External/servus/lib/osx/release&#10;../../External/libartnet/lib/osx&#10;../../External/joycon/lib/osx&#10;../../External/sdl/lib/osx"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_osc" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_opengl" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
-        <MODULEPATH id="juce_analytics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
+        <MODULEPATH id="juce_video"/>
+        <MODULEPATH id="juce_osc"/>
+        <MODULEPATH id="juce_opengl"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_cryptography"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
+        <MODULEPATH id="juce_analytics"/>
+        <MODULEPATH id="juce_dsp"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_audio_formats"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <LINUX_MAKE targetFolder="Builds/Raspberry" smallIcon="nVz6Li" bigIcon="nVz6Li"
-                extraLinkerFlags="-Wl,-rpath,&quot;lib&quot;" externalLibraries="bluetooth&#10;Servus&#10;curl&#10;artnet">
+                extraLinkerFlags="-Wl,-rpath,&quot;lib&quot;&#10;-Wl,--as-needed"
+                externalLibraries="bluetooth&#10;Servus&#10;curl&#10;artnet&#10;SDL2&#10;usb-1.0&#10;hidapi-hidraw">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/servus/lib/raspberry&#10;../../External/libartnet/lib/raspberry"
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/sdl/include&#10;/usr/include/freetype2&#10;../../External/hidapi/include&#10;../../External/libusb/include/libusb-1.0"
+                       libraryPath="../../External/servus/lib/raspberry&#10;../../External/libartnet/lib/raspberry&#10;../../External/sdl/lib/raspberry&#10;/usr/lib/arm-linux-gnueabihf"
                        linuxArchitecture="-march=native"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/servus/lib/raspberry&#10;../../External/libartnet/lib/raspberry"
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/sdl/include&#10;/usr/include/freetype2&#10;../../External/hidapi/include&#10;../../External/libusb/include/libusb-1.0"
+                       libraryPath="../../External/servus/lib/raspberry&#10;../../External/libartnet/lib/raspberry&#10;../../External/sdl/lib/raspberry&#10;/usr/lib/arm-linux-gnueabihf&#10;"
                        linuxArchitecture="-march=native"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_osc" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
         <MODULEPATH id="juce_opengl" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
@@ -1452,32 +1483,136 @@
         <MODULEPATH id="juce_core" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_analytics"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_audio_formats" path="~/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" externalLibraries="bluetooth&#10;Servus&#10;curl&#10;artnet"
-                extraLinkerFlags="-Wl,-rpath,&quot;lib&quot;" smallIcon="nVz6Li"
-                bigIcon="nVz6Li">
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" externalLibraries="bluetooth&#10;Servus&#10;curl&#10;artnet&#10;SDL2&#10;usb-1.0&#10;hidapi-hidraw"
+                extraLinkerFlags="-Wl,-rpath,&quot;lib&quot;&#10;-Wl,--as-needed"
+                smallIcon="nVz6Li" bigIcon="nVz6Li">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Chataigne"
-                       headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
-                       linuxArchitecture="-m64" libraryPath="../../External/servus/lib/linux&#10;../../External/libartnet/lib/linux"/>
-        <CONFIGURATION name="Release" optimisation="3" targetName="Chataigne" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include"
-                       linuxArchitecture="-m64" libraryPath="../../External/servus/lib/linux&#10;../../External/libartnet/lib/linux"/>
+                       headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/sdl/include&#10;../../External/hidapi/include&#10;../../External/hidapi/include&#10;../../External/libusb/include/libusb-1.0&#10;"
+                       linuxArchitecture="-m64" libraryPath="../../External/servus/lib/linux&#10;../../External/libartnet/lib/linux&#10;../../External/sdl/lib/linux&#10;/usr/lib/x86_64-linux-gnu/"/>
+        <CONFIGURATION name="Release" optimisation="3" targetName="Chataigne" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/sdl/include&#10;../../External/hidapi/include&#10;../../External/libusb/include/libusb-1.0"
+                       linuxArchitecture="-m64" libraryPath="../../External/servus/lib/linux&#10;../../External/libartnet/lib/linux&#10;../../External/sdl/lib/linux&#10;/usr/lib/x86_64-linux-gnu/"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_osc" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
         <MODULEPATH id="juce_opengl" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_events" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_audio_formats" path="~/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2019 targetFolder="Builds/VisualStudio2019_CI" extraDefs="USE_KINECT=1"
+            extraCompilerFlags="/Zm1000" externalLibraries="Setupapi.lib&#10;hid.lib&#10;Kinect20.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib&#10;hid.lib&#10;hidapi_static.lib"
+            smallIcon="nVz6Li" bigIcon="nVz6Li">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug&#10;../../External/hidapi/lib/win/x64"
+                       binaryPath="Binaries/CI"/>
+        <CONFIGURATION isDebug="0" name="Release" binaryPath="Binaries/CI" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release&#10;../../External/hidapi/lib/win/x64"
+                       alwaysGenerateDebugSymbols="1"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_osc" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_cryptography" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_analytics" path="../JUCE/Modules"/>
+      </MODULEPATHS>
+    </VS2019>
+    <VS2019 targetFolder="Builds/VisualStudio2019_Win7CI" smallIcon="nVz6Li"
+            bigIcon="nVz6Li" extraCompilerFlags="/Zm1000" externalLibraries="Setupapi.lib&#10;hid.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib&#10;hid.lib&#10;hidapi_static.lib"
+            extraDefs="USE_KINECT=0">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug&#10;../../External/hidapi/lib/win/x64"
+                       binaryPath="Binaries/Win7CI"/>
+        <CONFIGURATION isDebug="0" name="Release" libraryPath="../../External/joycon/lib/win&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release&#10;../../External/hidapi/lib/win/x64"
+                       headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include&#10;../../External/hidapi/include"
+                       binaryPath="Binaries/Win7CI"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_osc" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
+        <MODULEPATH id="juce_opengl" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_dsp" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_cryptography" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../JUCE/Modules"/>
+        <MODULEPATH id="juce_analytics" path="../JUCE/Modules"/>
+      </MODULEPATHS>
+    </VS2019>
+    <XCODE_MAC targetFolder="Builds/MacOSX_CI" externalLibraries="Servus&#10;artnet&#10;hidapi&#10;joytime-core&#10;joytime-input-hidapi&#10;SDL2&#10;iconv"
+               smallIcon="nVz6Li" bigIcon="nVz6Li" hardenedRuntimeOptions="com.apple.security.cs.allow-jit"
+               customPList="&lt;plist&gt;&#10;&lt;dict&gt;&#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;&#9;&#9;&lt;true/&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;"
+               microphonePermissionNeeded="1" extraFrameworks="IOBluetooth, ForceFeedback, IOKit"
+               documentExtensions="noisette" extraDefs="JUCE_SUPPORT_CARBON=0&#10;">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/joycon/include&#10;../../External/sdl/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/servus/lib/osx/debug&#10;../../External/libartnet/lib/osx&#10;../../External/joycon/lib/osx&#10;../../External/sdl/lib/osx"
+                       osxCompatibility="10.8 SDK"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/libartnet/include&#10;../../External/joycon/include&#10;../../External/sdl/include&#10;../../External/hidapi/include"
+                       libraryPath="../../External/servus/lib/osx/release&#10;../../External/libartnet/lib/osx&#10;../../External/joycon/lib/osx&#10;../../External/sdl/lib/osx"
+                       osxCompatibility="10.8 SDK"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_timeline" path="Modules"/>
+        <MODULEPATH id="juce_osc" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_organicui" path="Modules"/>
+        <MODULEPATH id="juce_opengl" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="~/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_cryptography" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_core" path="~/JUCE/modules"/>
@@ -1487,70 +1622,8 @@
         <MODULEPATH id="juce_audio_devices" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="~/JUCE/modules"/>
         <MODULEPATH id="juce_analytics" path="~/JUCE/modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
       </MODULEPATHS>
-    </LINUX_MAKE>
-    <VS2017 targetFolder="Builds/VisualStudio2017_CI" externalLibraries="Setupapi.lib&#10;hid.lib&#10;Kinect20.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib"
-            smallIcon="nVz6Li" bigIcon="nVz6Li" extraDefs="USE_KINECT=1">
-      <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" binaryPath="Binaries/CI" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/kinect/include&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/kinect/lib&#10;../../External/joycon/lib&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release"
-                       binaryPath="Binaries/CI" alwaysGenerateDebugSymbols="1" debugInformationFormat="ProgramDatabase"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_osc" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
-        <MODULEPATH id="juce_opengl" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_analytics" path="../JUCE/modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
-      </MODULEPATHS>
-    </VS2017>
-    <VS2017 targetFolder="Builds/VisualStudio2017_Win7" externalLibraries="Setupapi.lib&#10;hid.lib&#10;joytime-core.lib&#10;joytime-input-hidapi.lib&#10;Servus.lib&#10;dnssd.lib&#10;SDL2.lib&#10;libartnet.lib&#10;iphlpapi.lib"
-            smallIcon="nVz6Li" bigIcon="nVz6Li" extraDefs="USE_KINECT=0">
-      <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/joycon/lib&#10;../../External/servus/lib/win/x64/debug&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/debug"
-                       binaryPath="Binaries/Win7/Debug"/>
-        <CONFIGURATION isDebug="0" name="Release" headerPath="../../External/wiiuse&#10;../../External/serial/include&#10;../../External/asio&#10;../../External/joycon/include&#10;../../External/servus/include&#10;../../External/dnssd/include&#10;../../External/sdl/include&#10;../../External/libartnet/include"
-                       libraryPath="../../External/joycon/lib&#10;../../External/servus/lib/win/x64/release&#10;../../External/dnssd/lib&#10;../../External/sdl/lib/win&#10;../../External/libartnet/lib/win/release"
-                       binaryPath="Binaries/Win7"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_osc" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_organicui" path="../JUCE Modules"/>
-        <MODULEPATH id="juce_opengl" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_extra" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_analytics" path="D:/Softwares\JUCE\modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../../Softwares/JUCE/modules"/>
-      </MODULEPATHS>
-    </VS2017>
+    </XCODE_MAC>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
@@ -1570,10 +1643,13 @@
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_organicui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_timeline" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_ASIO="1" JUCE_WASAPI="1" JUCE_JACK="1" ORGANICUI_USE_SERVUS="1"
-               JUCE_ALLOW_SPECIAL_CHARS_IN_ADDRESS="1"/>
+               JUCE_ALLOW_SPECIAL_CHARS_IN_ADDRESS="1" TIMELINE_USE_SEQUENCEMANAGER_SINGLETON="0"
+               JUCE_USE_MP3AUDIOFORMAT="1" JUCE_USE_LAME_AUDIO_FORMAT="1" JUCE_USE_WINDOWS_MEDIA_FORMAT="1"
+               JUCE_ENABLE_BROADCAST_BY_DEFAULT="1" JUCE_EXCLUSIVE_BINDING_BY_DEFAULT="1"/>
   <LIVE_SETTINGS>
     <WINDOWS/>
     <OSX/>

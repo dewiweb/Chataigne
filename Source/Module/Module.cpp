@@ -11,11 +11,13 @@
 #include "Module.h"
 #include "Common/Command/CommandFactory.h"
 #include "ui/ModuleEditor.h"
-#include "Common/Command/Template/CommandTemplate.h"
+#include "ui/ModuleUI.h"
+#include "Common/Command/Template/CommandTemplateManager.h"
 #include "Module/modules/common/commands/scriptcommands/ScriptCommand.h"
 #include "UI/ChataigneAssetManager.h"
 #include "Common/Command/BaseCommandHandler.h"
 #include "ModuleCommandTester.h"
+#include "modules/common/commands/scriptcallback/ScriptCallbackCommand.h"
 
 Module::Module(const String& name) :
 	BaseItem(name, true, true),
@@ -27,13 +29,16 @@ Module::Module(const String& name) :
 	alwaysShowValues(false),
 	includeValuesInSave(false),
 	customType(""),
-	templateManager(this),
     canHandleRouteValues(false)
 
 {
 	itemDataType = "Module";
+	showWarningInUI = true;
 
 	canInspectChildContainers = true;
+	
+	inActivityTrigger.reset(new Trigger("IN Activity", "Incoming Activity Signal"));
+	outActivityTrigger.reset(new Trigger("OUT Activity", "Outgoing Activity Signal"));
 
 	logIncomingData = addBoolParameter("Log Incoming", "Enable / Disable logging of incoming data for this module", false);
 	logIncomingData->hideInEditor = true;
@@ -42,15 +47,6 @@ Module::Module(const String& name) :
 	logOutgoingData = addBoolParameter("Log Outgoing", "Enable / Disable logging of outgoing data for this module", false);
 	logOutgoingData->hideInEditor = true;
 	logOutgoingData->hideInOutliner = true;
-
-	inActivityTrigger = addTrigger("IN Activity", "Incoming Activity Signal");
-	inActivityTrigger->hideInEditor = true;
-	inActivityTrigger->setControllableFeedbackOnly(true);
-
-	outActivityTrigger = addTrigger("OUT Activity", "Outgoing Activity Signal");
-	outActivityTrigger->hideInEditor = true;
-	outActivityTrigger->setControllableFeedbackOnly(true);
-
 	
 	moduleParams.saveAndLoadRecursiveData = true;
 	addChildControllableContainer(&moduleParams);
@@ -58,19 +54,29 @@ Module::Module(const String& name) :
 	addChildControllableContainer(&valuesCC);
 	valuesCC.includeTriggersInSaveLoad = true;
 
+	defManager.reset(new CommandDefinitionManager());
 
 	commandTester.reset(new ModuleCommandTester(this));
 
 	controllableContainers.move(controllableContainers.indexOf(scriptManager.get()), controllableContainers.size() - 1);
 
 	addChildControllableContainer(commandTester.get());
-	addChildControllableContainer(&templateManager);
+
+	templateManager.reset(new CommandTemplateManager(this));
+	addChildControllableContainer(templateManager.get());
 
 	scriptManager->scriptTemplate = ChataigneAssetManager::getInstance()->getScriptTemplateBundle(StringArray("generic","module"));
+
+	scriptCommanDef.reset(CommandDefinition::createDef(this, "", "Script callback", &ScriptCallbackCommand::create));
 }
 
 Module::~Module()
 {
+}
+
+void Module::clearItem()
+{
+	if(templateManager != nullptr) templateManager->clear();
 }
 
 void Module::setupIOConfiguration(bool _hasInput, bool _hasOutput)
@@ -79,8 +85,8 @@ void Module::setupIOConfiguration(bool _hasInput, bool _hasOutput)
 	if (_hasOutput != hasOutput) hasOutput = _hasOutput;
 	
 	valuesCC.hideInEditor = !alwaysShowValues && !hasInput && valuesCC.controllables.size() == 0 && valuesCC.controllableContainers.size() == 0;
-	commandTester->hideInEditor = defManager.definitions.size() == 0 && !hasOutput;
-	templateManager.hideInEditor = defManager.definitions.size() == 0 && !hasOutput;
+	commandTester->hideInEditor = defManager->definitions.size() == 0 && !hasOutput;
+	templateManager->hideInEditor = defManager->definitions.size() == 0 && !hasOutput;
 	moduleListeners.call(&ModuleListener::moduleIOConfigurationChanged);
 }
 
@@ -104,34 +110,38 @@ Array<WeakReference<Controllable>> Module::getValueControllables()
 Array<CommandDefinition*> Module::getCommands(bool includeTemplateCommands)
 {
 	Array<CommandDefinition*> result;
-	for (auto &d : defManager.definitions) result.add(d);
+	for (auto &d : defManager->definitions) result.add(d);
 	if (includeTemplateCommands)
 	{
-		for (auto &td : templateManager.defManager.definitions) result.add(td);
+		for (auto &td : templateManager->defManager.definitions) result.add(td);
 	}
+
+	result.add(scriptCommanDef.get());
 
 	return result;
 }
 
 CommandDefinition * Module::getCommandDefinitionFor(StringRef menu, StringRef name)
 {
-	if (menu == templateManager.menuName) return templateManager.defManager.getCommandDefinitionFor(menu, name);
-	return defManager.getCommandDefinitionFor(menu, name);
+	if (menu == templateManager->menuName) return templateManager->defManager.getCommandDefinitionFor(menu, name);
+	if (name == String("Script callback")) return scriptCommanDef.get();
+	return defManager->getCommandDefinitionFor(menu, name);
 }
 
 PopupMenu Module::getCommandMenu(int offset, CommandContext context)
 {
-	PopupMenu m = defManager.getCommandMenu(offset, context);
+	PopupMenu m = defManager->getCommandMenu(offset, context);
 	m.addSeparator();
-	templateManager.defManager.addCommandsToMenu(&m,offset + 500, context);
-	
+	templateManager->defManager.addCommandsToMenu(&m,offset + 500, context);
+	m.addItem(offset+401, "Script callback");
 	return m;
 }
 
 CommandDefinition * Module::getCommandDefinitionForItemID(int itemID)
 {
-	if(itemID >= 500) return templateManager.defManager.definitions[itemID-500];
-	else return defManager.definitions[itemID];
+	if (itemID == 400) return scriptCommanDef.get();
+	if(itemID >= 500) return templateManager->defManager.definitions[itemID-500];
+	else return defManager->definitions[itemID];
 }
 
 void Module::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Controllable * c)
@@ -154,30 +164,36 @@ void Module::onControllableFeedbackUpdateInternal(ControllableContainer * cc, Co
 var Module::getJSONData()
 {
 	var data = BaseItem::getJSONData();
-	data.getDynamicObject()->setProperty("params", moduleParams.getJSONData());
+	data.getDynamicObject()->setProperty("params", moduleParams.getJSONData()); //keep "params" to avoid conflict with container's parameter
 
-	var templateData = templateManager.getJSONData();
-	if (!templateData.isVoid() && templateData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty("templates", templateData);
+	var templateData = templateManager->getJSONData();
+	if (!templateData.isVoid() && templateData.getDynamicObject()->getProperties().size() > 0) data.getDynamicObject()->setProperty(templateManager->shortName, templateData);
 
-	if(includeValuesInSave) data.getDynamicObject()->setProperty("values", valuesCC.getJSONData());
+	if(includeValuesInSave) data.getDynamicObject()->setProperty(valuesCC.shortName, valuesCC.getJSONData());
 
 	return data;
+}
+
+void Module::loadJSONDataItemInternal(var data)
+{
+	if (includeValuesInSave) valuesCC.loadJSONData(data.getProperty(valuesCC.shortName, var()), true);
+	moduleParams.loadJSONData(data.getProperty("params", var())); //keep "params" to avoid conflict with container's parameter
+	templateManager->loadJSONData(data.getProperty(templateManager->shortName , var()), true);
 }
 
 void Module::loadJSONDataInternal(var data)
 {
 	BaseItem::loadJSONDataInternal(data);
-	moduleParams.loadJSONData(data.getProperty("params", var()));
-	templateManager.loadJSONData(data.getProperty("templates", var()), true);
-
-	if (includeValuesInSave) valuesCC.loadJSONData(data.getProperty("values", var()), true);
+	setupScriptsFromJSONData(customModuleData); //needs to load after item loadJSON (scriptManager is clearing at load)
 }
 
 void Module::setupModuleFromJSONData(var data)
 {
+	customModuleData = data;
 	customType = data.getProperty("name","");
 	setNiceName(data.getProperty("name",""));
-
+	
+	
 	loadDefaultsParameterValuesForContainer(data.getProperty("defaults", var()), &moduleParams);
 
 	var hideParamsList = data.getProperty("hideDefaultParameters",var());
@@ -185,34 +201,31 @@ void Module::setupModuleFromJSONData(var data)
 	{
 		for (int i = 0; i < hideParamsList.size(); i++)
 		{
-			Controllable * c = moduleParams.getControllableByName(hideParamsList[i].toString(), true);
+			String pName = hideParamsList[i].toString();
+			if (!pName.startsWithChar('/')) pName = "/" + pName;
+			Controllable * c = moduleParams.getControllableForAddress(pName, true);
 			if (c != nullptr) c->hideInEditor = true;
-			ControllableContainer* cc = moduleParams.getControllableContainerByName(hideParamsList[i].toString(), true);
+			ControllableContainer* cc = moduleParams.getControllableContainerForAddress(pName, true);
 			if (cc != nullptr) cc->hideInEditor = true;
 		}
 	}
 
 
 	createControllablesForContainer(data.getProperty("parameters", var()), &moduleParams);
-	createControllablesForContainer(data.getProperty("values", var()), &valuesCC);
 
-	
+	alwaysShowValues = data.getProperty("alwaysShowValues", false);
+	createControllablesForContainer(data.getProperty("values", var()), &valuesCC);
 
 	Array<WeakReference<Controllable>> valueList = getValueControllables();
 
-	Array<var> * scriptData = data.getProperty("scripts", var()).getArray();
-	for (auto &s : *scriptData)
-	{
-		Script * script = scriptManager->addItem(nullptr,var(),false);
-		//DBG("Set script path : " << data.getProperty("modulePath", "").toString() << "/" << s.toString());
-		script->filePath->setValue(data.getProperty("modulePath", "").toString() + "/"+s.toString());
-	}
+	if (!isCurrentlyLoadingData) setupScriptsFromJSONData(data);
+	
 
 	bool valuesAreEmpty = valuesCC.controllables.size() == 0 && valuesCC.controllableContainers.size() == 0;
 	bool hInput = data.getProperty("hasInput", valuesAreEmpty ? false : hasInput);
 	bool hOutput = data.getProperty("hasOutput", hasOutput);
 
-	if (data.getProperty("hideDefaultCommands", false)) defManager.clear();
+	if (data.getProperty("hideDefaultCommands", false)) defManager->clear();
 
 	if (data.hasProperty("commands"))
 	{
@@ -227,10 +240,32 @@ void Module::setupModuleFromJSONData(var data)
 				else if (cContext == "mapping") context = CommandContext::MAPPING;
 			}
 
-			defManager.add(CommandDefinition::createDef(this, cData.value.getProperty("menu", ""), cData.name.toString(), &ScriptCommand::create)->addParam("commandData",cData.value));
+			defManager->add(CommandDefinition::createDef(this, cData.value.getProperty("menu", ""), cData.name.toString(), &ScriptCommand::create)->addParam("commandData",cData.value));
 		}
 	}
 	setupIOConfiguration(hInput, hOutput);
+}
+
+void Module::setupScriptsFromJSONData(var data)
+{
+	if (!data.hasProperty("scripts")) return;
+
+	Array<var>* scriptData = data.getProperty("scripts", var()).getArray();
+
+	int index = 0;
+	for (auto& s : *scriptData)
+	{
+		Script* script = scriptManager->addItem(nullptr, var(), false);
+		scriptManager->setItemIndex(script, index);
+		script->filePath->customBasePath = data.getProperty("modulePath", "");
+		script->filePath->setControllableFeedbackOnly(true);
+		script->filePath->setValue(s.toString());
+		script->updateRate->setControllableFeedbackOnly(true);
+		script->isSavable = false;
+		script->userCanDuplicate = false;
+		script->userCanRemove = false;
+		index++;
+	}
 }
 
 void Module::loadDefaultsParameterValuesForContainer(var data, ControllableContainer * cc)
@@ -268,8 +303,9 @@ void Module::createControllablesForContainer(var data, ControllableContainer * c
 			
 			if (childCC == nullptr)
 			{
+				int index = p.value.getProperty("index", -1);
 				childCC = new ControllableContainer(p.name.toString());
-				cc->addChildControllableContainer(childCC);
+				cc->addChildControllableContainer(childCC, false, index);
 				customModuleContainers.add(childCC);
 			}
 
@@ -315,7 +351,7 @@ void Module::createControllablesForContainer(var data, ControllableContainer * c
 void Module::onContainerNiceNameChanged()
 {
 	BaseItem::onContainerNiceNameChanged();
-	templateManager.setupTemplateDefinition();
+	templateManager->setupDefinitionsFromModule();
 }
 
 
@@ -377,8 +413,6 @@ Controllable * Module::getControllableForJSONDefinition(const String &name, var 
 		{
 			c->description = d->getProperty("description").toString();
 		}
-
-		
 		
 	}
 
@@ -406,6 +440,11 @@ InspectableEditor * Module::getEditor(bool isRoot)
 	return new ModuleEditor(this, isRoot); //temp, should have a proper base module editor
 }
 
+ModuleUI* Module::getModuleUI()
+{
+	return new ModuleUI(this);
+}
+
 String Module::getTargetLabelForValueControllable(Controllable * c)
 {
 	String label = c->niceName;
@@ -424,7 +463,7 @@ String Module::getTargetLabelForValueControllable(Controllable * c)
 		index++;
 	}
 
-	label = m->niceName + ":" + label;
+	label = m->niceName + " > " + label;
 
 	return label;
 }

@@ -13,6 +13,10 @@
 #include "Common/Command/BaseCommand.h"
 #include "../OSModule.h"
 
+#if JUCE_WINDOWS
+#include <Windows.h>
+#endif
+
 class OSExecCommand :
 	public BaseCommand
 {
@@ -20,12 +24,13 @@ public:
 	OSExecCommand(OSModule * _module, CommandContext context, var params);
 	~OSExecCommand();
 
-	enum ActionType { OPEN_FILE, LAUNCH_APP, KILL_APP };
+	enum ActionType { OPEN_FILE, LAUNCH_APP, KILL_APP, LAUNCH_COMMAND, LAUNCH_COMMAND_FILE };
 	ActionType actionType;
 
 	StringParameter * target;
 	StringParameter * launchOptions;
 	BoolParameter * killMode;
+	BoolParameter* silentMode;
 
 	void triggerInternal() override;
 

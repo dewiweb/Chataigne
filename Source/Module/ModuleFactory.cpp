@@ -10,39 +10,51 @@
 
 #include "ModuleFactory.h"
 
+#include "modules/controller/joycon/JoyConModule.h" //must be included before some other, don't know which one
+
 #include "modules/osc/custom/CustomOSCModule.h"
 #include "modules/osc/resolume/ResolumeModule.h"
 #include "modules/osc/millumin/MilluminModule.h"
+#include "modules/osc/reaper/ReaperModule.h"
+#include "modules/osc/live/LiveOSCModule.h"
+#include "modules/osc/dlight/DLightModule.h"
+#include "modules/osc/powerpoint/PowerpointModule.h"
+#include "modules/osc/heavym/HeavyMModule.h"
+
+#include "modules/oscquery/generic/GenericOSCQueryModule.h"
+#include "modules/oscquery/MadMapperModule.h"
+
+#include "modules/tcp/tcpclient/TCPClientModule.h"
+#include "modules/tcp/tcpclient/watchout/WatchoutModule.h"
+#include "modules/tcp/tcpclient/pjlink/PJLinkModule.h"
+
+#include "modules/tcp/tcpserver/TCPServerModule.h"
+
 #include "modules/midi/MIDIModule.h"
+
+#include "modules/serial/SerialModule.h"
+#include "modules/udp/UDPModule.h"
+#include "modules/http/HTTPModule.h"
+#include "modules/dmx/DMXModule.h"
+
 #include "modules/controller/gamepad/GamepadModule.h"
 #include "modules/controller/joystick/JoystickModule.h"
 #include "modules/controller/wiimote/WiimoteModule.h"
 #include "modules/controller/keyboard/KeyboardModule.h"
-#include "modules/osc/reaper/ReaperModule.h"
-#include "modules/audio/AudioModule.h"
+#include "modules/controller/mouse/MouseModule.h"
 #include "modules/controller/kinect/KinectV2Module.h"
-#include "modules/serial/SerialModule.h"
-#include "modules/dmx/DMXModule.h"
-#include "modules/osc/live/LiveOSCModule.h"
-#include "modules/controller/myo/MyoModule.h"
-#include "modules/midi/Launchpad/LaunchpadModule.h"
-#include "modules/osc/dlight/DLightModule.h"
-#include "modules/tcp/TCPModule.h"
-#include "modules/tcp/vlc/VLCModule.h"
+#include "modules/controller/streamdeck/StreamDeckModule.h"
+
 #include "modules/generators/metronome/MetronomeModule.h"
 #include "modules/generators/signal/SignalModule.h"
-#include "modules/udp/UDPModule.h"
-#include "modules/tcp/watchout/WatchoutModule.h"
+
 #include "modules/system/time/TimeModule.h"
 #include "modules/system//os/OSModule.h"
-#include "modules/tcp/pjlink/PJLinkModule.h"
-#include "modules/controller/joycon/JoyConModule.h"
-#include "modules/osc/powerpoint/PowerpointModule.h"
-#include "modules/osc/heavym/HeavyMModule.h"
-#include "modules/http/HTTPModule.h"
-#include "modules/oscquery/generic/GenericOSCQueryModule.h"
-#include "modules/oscquery/MadMapperModule.h"
+
+#include "modules/audio/AudioModule.h"
+
 #include "Community/CommunityModuleManager.h"
+
 
 juce_ImplementSingleton(ModuleFactory)
 
@@ -54,18 +66,22 @@ ModuleFactory::ModuleFactory() {
 	moduleDefs.add(new ModuleDefinition("Protocol", "DMX", &DMXModule::create));
 	moduleDefs.add(new ModuleDefinition("Protocol", "Serial", &SerialModule::create));
 	moduleDefs.add(new ModuleDefinition("Protocol", "UDP", &UDPModule::create));  
-	moduleDefs.add(new ModuleDefinition("Protocol", "TCP Client", &TCPModule::create));
+	moduleDefs.add(new ModuleDefinition("Protocol", "TCP Client", &TCPClientModule::create));
+	moduleDefs.add(new ModuleDefinition("Protocol", "TCP Server", &TCPServerModule::create));
 	moduleDefs.add(new ModuleDefinition("Protocol", "HTTP", &HTTPModule::create));
 	moduleDefs.add(new ModuleDefinition("Protocol", "PJLink", &PJLinkModule::create));
 	
 
 	moduleDefs.add(new ModuleDefinition("Hardware", "Sound Card", &AudioModule::create));
 
-	moduleDefs.add(new ModuleDefinition("Hardware", "Launchpad", &LaunchpadModule::create));
 	moduleDefs.add(new ModuleDefinition("Hardware", "Wiimote", &WiimoteModule::create));
 	moduleDefs.add(new ModuleDefinition("Hardware", "JoyCon", &JoyConModule::create));
 	moduleDefs.add(new ModuleDefinition("Hardware", "Keyboard", &KeyboardModule::create));
-
+	moduleDefs.add(new ModuleDefinition("Hardware", "Mouse", &MouseModule::create));
+	moduleDefs.add(new ModuleDefinition("Hardware", "KinectV2", &KinectV2Module::create));
+	moduleDefs.add(new ModuleDefinition("Hardware", "Gamepad", &GamepadModule::create));
+	moduleDefs.add(new ModuleDefinition("Hardware", "Joystick", &JoystickModule::create));
+	moduleDefs.add(new ModuleDefinition("Hardware", "Stream Deck", &StreamDeckModule::create));
 
 
 	moduleDefs.add(new ModuleDefinition("Software", "DLight", &DLightModule::create));
@@ -75,17 +91,8 @@ ModuleFactory::ModuleFactory() {
 	moduleDefs.add(new ModuleDefinition("Software", "Millumin", &MilluminModule::create));
 	moduleDefs.add(new ModuleDefinition("Software", "Reaper", &ReaperModule::create));
 	moduleDefs.add(new ModuleDefinition("Software", "Resolume", &ResolumeModule::create));
-	//moduleDefs.add(new ModuleDefinition("Software", "VLC", &VLCModule::create));
 	moduleDefs.add(new ModuleDefinition("Software", "Watchout", &WatchoutModule::create));
-
-
-#if JUCE_WINDOWS
-	moduleDefs.add(new ModuleDefinition("Hardware", "KinectV2", &KinectV2Module::create));
-	moduleDefs.add(new ModuleDefinition("Hardware", "Gamepad", &GamepadModule::create));
-	moduleDefs.add(new ModuleDefinition("Hardware", "Joystick", &JoystickModule::create));
-	//moduleDefs.add(new ModuleDefinition("Hardware", "Myo", &MyoModule::create));
 	moduleDefs.add(new ModuleDefinition("Software", "PowerPoint", &PowerPointModule::create));
-#endif
 
 	moduleDefs.add(new ModuleDefinition("Generator", "Metronome", &MetronomeModule::create));
 	moduleDefs.add(new ModuleDefinition("Generator", "Signal", &SignalModule::create));
@@ -99,10 +106,11 @@ ModuleFactory::ModuleFactory() {
 
 void ModuleFactory::addCustomModules()
 {
+	Array<File> modulesList;
+
 	File modulesFolder = getCustomModulesFolder();
 	modulesFolder.createDirectory();
 
-	Array<File> modulesList;
 	modulesFolder.findChildFiles(modulesList, File::findDirectories, false);
 	for (auto &m : modulesList)
 	{
@@ -129,7 +137,23 @@ void ModuleFactory::addCustomModules()
 
 		if (moduleName.isNotEmpty() && moduleType.isNotEmpty())
 		{
-			std::function<Module*()> createFunc;
+			
+			if (ModuleDefinition* sourceDef = getDefinitionForType(moduleType))
+			{
+				LOG("Found custom module : " << moduleMenuPath << ":" << moduleName);
+				ModuleDefinition* def = moduleDefs.add(new ModuleDefinition(moduleMenuPath, moduleName, sourceDef->createFunc));
+				customModulesDefMap.set(moduleName, def);
+				def->jsonData = moduleData;
+				def->moduleFolder = m;
+				def->isCustomModule = true;
+			}
+			else
+			{
+				LOGWARNING("Problem loading custom module : " << moduleName << " : Base module type not handled : " << moduleType);
+				continue;
+			}
+			
+			/*
 			if (moduleType == "Serial") createFunc = &SerialModule::create;
 			else if (moduleType == "OSC") createFunc = &CustomOSCModule::create;
 			else if (moduleType == "MIDI") createFunc = &MIDIModule::create;
@@ -140,13 +164,9 @@ void ModuleFactory::addCustomModules()
 				LOGWARNING("Problem loading custom module : " << moduleName << " : Base module type not handled : " << moduleType);
 				continue;
 			}
+			*/
 
-			LOG("Found custom module : " << moduleMenuPath << ":" << moduleName);
-			ModuleDefinition * def = moduleDefs.add(new ModuleDefinition(moduleMenuPath,moduleName, createFunc));
-			customModulesDefMap.set(moduleName, def);
-			def->jsonData = moduleData;
-			def->moduleFolder = m;
-			def->isCustomModule = true;
+			
 		}
 		
 	}
@@ -174,6 +194,8 @@ File ModuleFactory::getFolderForCustomModule(StringRef moduleName) const
 
 void ModuleFactory::buildPopupMenu()
 {
+	MessageManagerLock mmLock;
+
 	menu.clear();
 
 	OwnedArray<PopupMenu> subMenus;
@@ -186,7 +208,7 @@ void ModuleFactory::buildPopupMenu()
 
 		if (d->menuPath.isEmpty())
 		{
-			menu.addItem(itemID, d->moduleType);
+			menu.addItem(itemID, d->moduleType, true, false, d->icon);
 			continue;
 		}
 
@@ -214,7 +236,7 @@ void ModuleFactory::buildPopupMenu()
 			subMenus[subMenuIndex]->addSectionHeader("Community Modules");
 		}
 
-		subMenus[subMenuIndex]->addItem(itemID, d->moduleType);
+		subMenus[subMenuIndex]->addItem(itemID, d->moduleType, true, false, d->icon); 
 		lastDefIsCustom.set(subMenuIndex, d->isCustomModule);
 	}
 
@@ -222,6 +244,16 @@ void ModuleFactory::buildPopupMenu()
 
 	menu.addSeparator();
 	menu.addItem(-1, "Get more modules...");
+}
+
+ModuleDefinition* ModuleFactory::getDefinitionForType(const String& moduleType)
+{
+	for (auto &m : moduleDefs)
+	{
+		if (m->moduleType == moduleType) return m;
+	}
+	
+	return nullptr;
 }
 
 File ModuleFactory::getCustomModulesFolder() const
@@ -261,4 +293,18 @@ Module * ModuleFactory::createModule(const String & moduleType)
 		}
 	}
 	return nullptr;
+}
+
+
+
+ModuleDefinition::ModuleDefinition(const String& menuPath, const String& type, std::function<Module* ()> createFunc, var jsonData, bool isCustomModule) :
+	menuPath(menuPath),
+	moduleType(type),
+	jsonData(jsonData),
+	isCustomModule(isCustomModule),
+	createFunc(createFunc)
+{
+	int numBytes = 0;
+	const char* iconData = BinaryData::getNamedResource((type.replace(" ", "_") + "_png").getCharPointer(), numBytes);
+	if (iconData != nullptr) icon = ImageCache::getFromMemory(iconData, numBytes);
 }

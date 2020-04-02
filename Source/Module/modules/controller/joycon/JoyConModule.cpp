@@ -33,9 +33,6 @@ JoyConModule::JoyConModule() :
 	leftAccelX = leftValues.addFloatParameter("Left Accel X", "", 0, -1, 1);
 	leftAccelY = leftValues.addFloatParameter("Left Accel Y", "", 0, -1, 1);
 	leftAccelZ = leftValues.addFloatParameter("Left Accel Z", "", 0, -1, 1);
-	leftAccelX->autoAdaptRange = true;
-	leftAccelY->autoAdaptRange = true;
-	leftAccelZ->autoAdaptRange = true;
 
 	leftRoll = leftValues.addFloatParameter("Left Roll", "", 0, -1, 1);
 	leftPitch = leftValues.addFloatParameter("Left Pitch", "", 0, -1, 1);
@@ -53,12 +50,9 @@ JoyConModule::JoyConModule() :
 	minus = leftValues.addBoolParameter("-", "", false);
 	capture = leftValues.addBoolParameter("Capture", "", false);
 
-	rightAccelX = leftValues.addFloatParameter("Right Accel X", "", 0, -1, 1);
-	rightAccelY = leftValues.addFloatParameter("Right Accel Y", "", 0, -1, 1);
-	rightAccelZ = leftValues.addFloatParameter("Right Accel Z", "", 0, -1, 1);
-	rightAccelX->autoAdaptRange = true;
-	rightAccelY->autoAdaptRange = true;
-	rightAccelZ->autoAdaptRange = true;
+	rightAccelX = rightValues.addFloatParameter("Right Accel X", "", 0, -1, 1);
+	rightAccelY = rightValues.addFloatParameter("Right Accel Y", "", 0, -1, 1);
+	rightAccelZ = rightValues.addFloatParameter("Right Accel Z", "", 0, -1, 1);
 
 	rightRoll = rightValues.addFloatParameter("Right Roll", "", 0, -1, 1);
 	rightPitch = rightValues.addFloatParameter("Right Pitch", "", 0, -1, 1);
@@ -86,7 +80,7 @@ JoyConModule::~JoyConModule()
 	stopThread(1000);
 }
 
-#if JUCE_WINDOWS
+#if JUCE_WINDOWS || JUCE_MAC
 
 void JoyConModule::updateController(Joytime::Controller * controller)
 {
@@ -194,8 +188,8 @@ void JoyConModule::onContainerTriggerTriggered(Trigger * t)
 
 void JoyConModule::run()
 {
-#if JUCE_WINDOWS
-	std::vector<Joytime::Controller> cVector = Joytime::scanForControllers();
+#if JUCE_WINDOWS || JUCE_MAC
+    std::vector<Joytime::Controller> cVector = Joytime::scanForControllers();
 
 	controllers.clear();
 

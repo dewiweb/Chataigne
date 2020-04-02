@@ -85,7 +85,7 @@ void ActionUI::resizedInternalHeader(Rectangle<int>& r)
 	BaseItemUI::resizedInternalHeader(r);
 	//validUI->setBounds(r.removeFromRight(headerHeight));
 	//r.removeFromRight(2);
-	triggerAllUI->setBounds(r.removeFromRight(60));
+	triggerAllUI->setBounds(r.removeFromRight(70));
 	if (progressionUI->isVisible())
 	{
 		progressionUI->setBounds(r.removeFromRight(40).reduced(2, 6));
@@ -186,5 +186,36 @@ void ActionUI::newMessage(const Action::ActionEvent & e)
 		if (action->actionRoles.size() == 0) shouldRepaint = true;
 		break;
 
+	}
+}
+
+void ActionUI::addContextMenuItems(PopupMenu& p)
+{
+	p.addItem(100, "Copy conditions");
+	p.addItem(101, "Paste conditions");
+
+	if (action->csmOn != nullptr)
+	{
+		p.addItem(102, "Copy consequences TRUE");
+		p.addItem(103, "Paste consequences TRUE");
+	}
+
+	if (action->csmOff != nullptr)
+	{
+		p.addItem(104, "Copy consequences FALSE");
+		p.addItem(105, "Paste consequences FALSE");
+	}
+}
+
+void ActionUI::handleContextMenuResult (int result)
+{
+	switch (result)
+	{
+		case 100: SystemClipboard::copyTextToClipboard(JSON::toString(action->cdm.getJSONData())); break;
+		case 101: action->cdm.loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard())); break;
+		case 102: SystemClipboard::copyTextToClipboard(JSON::toString(action->csmOn->getJSONData())); break;
+		case 103: action->csmOn->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard())); break;
+		case 104: SystemClipboard::copyTextToClipboard(JSON::toString(action->csmOff->getJSONData())); break;
+		case 105: action->csmOff->loadJSONData(JSON::fromString(SystemClipboard::getTextFromClipboard())); break;
 	}
 }

@@ -12,7 +12,6 @@
 
 #include "Module/Module.h"
 
-#if JUCE_WINDOWS
 
 #include "Common/InputSystem/InputSystemManager.h"
 
@@ -25,6 +24,10 @@ public:
 	~GamepadModule();
 
 	GamepadParameter * gamepadParam;
+
+	ControllableContainer calibCC;
+	Array<FloatParameter*> axisOffset;
+	Array<FloatParameter*> axisDeadzone;
 	
 	void rebuildValues();
 
@@ -38,5 +41,3 @@ public:
 
 };
 
-
-#endif

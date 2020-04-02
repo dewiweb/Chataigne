@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef SERIALMODULE_H_INCLUDED
-#define SERIALMODULE_H_INCLUDED
+#pragma once
 
 #include "../common/streaming/StreamingModule.h"
 #include "Common/Serial/SerialManager.h"
@@ -34,11 +33,13 @@ public:
 	BoolParameter * isConnected;
 
 	virtual void setCurrentPort(SerialDevice *port);
+
+	virtual void onContainerParameterChangedInternal(Parameter* p) override;
 	virtual void onControllableFeedbackUpdateInternal(ControllableContainer *, Controllable * c) override;
 
 	virtual bool isReadyToSend() override;
-	virtual void sendMessageInternal(const String &message) override;
-	virtual void sendBytesInternal(Array<uint8> data) override;
+	virtual void sendMessageInternal(const String &message, var) override;
+	virtual void sendBytesInternal(Array<uint8> data, var) override;
 
 
 	// Inherited via SerialDeviceListener
@@ -75,7 +76,3 @@ public:
 	virtual String getDefaultTypeString() const override { return "Serial"; }
 
 };
-
-
-
-#endif  // SERIALMODULE_H_INCLUDED

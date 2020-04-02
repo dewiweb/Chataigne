@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef CUSTOMOSCMODULE_H_INCLUDED
-#define CUSTOMOSCMODULE_H_INCLUDED
+#pragma once
 
 #include "../OSCModule.h"
 
@@ -22,7 +21,6 @@ public:
 
 	BoolParameter * autoAdd;
 	BoolParameter * splitArgs;
-	BoolParameter * autoRange;
 	BoolParameter * autoFeedback;
 
 	void processMessageInternal(const OSCMessage &msg) override;
@@ -38,5 +36,3 @@ public:
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CustomOSCModule)
 };
-
-#endif  // CUSTOMOSCMODULE_H_INCLUDED

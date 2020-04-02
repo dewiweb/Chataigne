@@ -13,11 +13,12 @@
 #include "ui/MappingInputEditor.h"
 
 MappingInput::MappingInput() :
-	ControllableContainer("Input"),
+	BaseItem("Input", false, false),
 	inputReference(nullptr),
 	mappingInputAsyncNotifier(10)
 {
-	
+	canBeCopiedAndPasted = true;
+
 	nameCanBeChangedByUser = false;
 	inputTarget = addTargetParameter("Input Value", "Parameter to be the input");
 	inputTarget->showTriggers = false;
@@ -61,9 +62,11 @@ void MappingInput::setInput(Parameter * _input)
 	mappingInputAsyncNotifier.addMessage(new MappingInputEvent(MappingInputEvent::INPUT_REFERENCE_CHANGED, this));
 }
 
-void MappingInput::onContainerParameterChanged(Parameter * p)
+void MappingInput::onContainerParameterChangedInternal(Parameter * p)
 {
-	if (p == inputTarget)
+	BaseItem::onContainerParameterChangedInternal(p);
+
+	if (p == inputTarget && inputTarget->enabled)
 	{
 		setInput(inputTarget->target.wasObjectDeleted() ? nullptr : dynamic_cast<Parameter *>(inputTarget->target.get()));
 	}
